@@ -1,24 +1,58 @@
-import type { Candidate, ScoreWeights } from "@/types";
+import { SCORE_DIMENSIONS, type Candidate, type ScoreDimension, type ScoreWeights } from "@/types";
+
+export const DIMENSION_LABELS: Record<ScoreDimension, string> = {
+  skills: "Skills",
+  experience: "Experience",
+  education: "Education",
+  profileQuality: "Profile quality",
+};
 
 export function weightsTotal(weights: ScoreWeights): number {
-  return Object.values(weights).reduce((sum, value) => sum + value, 0);
+  return SCORE_DIMENSIONS.reduce((sum, dimension) => sum + weights[dimension], 0);
 }
 
+/** Weighted 0-100 score for a candidate. */
 export function weightedScore(candidate: Candidate, weights: ScoreWeights): number {
-  const { breakdown } = candidate;
-  const total =
-    breakdown.skills * weights.skills +
-    breakdown.experience * weights.experience +
-    breakdown.education * weights.education +
-    breakdown.profileQuality * weights.profileQuality;
+  const total = SCORE_DIMENSIONS.reduce(
+    (sum, dimension) => sum + candidate.breakdown[dimension] * weights[dimension],
+    0,
+  );
   return total / 100;
+}
+
+/**
+ * Sets one weight and spreads the remainder over the others in proportion, so the
+ * total always stays exactly 100. TODO(spec): confirm this is the intended slider behaviour.
+ */
+export function rebalanceWeights(
+  weights: ScoreWeights,
+  changed: ScoreDimension,
+  value: number,
+): ScoreWeights {
+  const clamped = Math.max(0, Math.min(100, Math.round(value)));
+  const others = SCORE_DIMENSIONS.filter((dimension) => dimension !== changed);
+  const remaining = 100 - clamped;
+  const otherTotal = others.reduce((sum, dimension) => sum + weights[dimension], 0);
+
+  const next = { ...weights, [changed]: clamped };
+  let assigned = 0;
+  for (const dimension of others) {
+    const share =
+      otherTotal === 0 ? remaining / others.length : (weights[dimension] / otherTotal) * remaining;
+    next[dimension] = Math.floor(share);
+    assigned += next[dimension];
+  }
+  for (let left = remaining - assigned, i = 0; left > 0; left--, i = (i + 1) % others.length) {
+    next[others[i]] += 1;
+  }
+  return next;
 }
 
 /** Client-side re-rank: ranked candidates first, knocked-out candidates kept in their own group. */
 export function rankCandidates(candidates: Candidate[], weights: ScoreWeights) {
   const ranked = candidates
-    .filter((c) => !c.filteredOut)
+    .filter((candidate) => !candidate.filteredOut)
     .sort((a, b) => weightedScore(b, weights) - weightedScore(a, weights));
-  const filteredOut = candidates.filter((c) => c.filteredOut);
+  const filteredOut = candidates.filter((candidate) => candidate.filteredOut);
   return { ranked, filteredOut };
 }

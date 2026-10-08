@@ -1,5 +1,5 @@
-import { PageHeader } from "@/components/shell/page-header";
+import { JobsView } from "@/components/jobs/jobs-view";
 
 export default function JobsPage() {
-  return <PageHeader title="Jobs" description="TODO(spec): build from docs/screens." />;
+  return <JobsView />;
 }

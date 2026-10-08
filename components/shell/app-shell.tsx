@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Badge, Button, Icon } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { DevSwitcher } from "./dev-switcher";
@@ -28,7 +28,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="px-3 pt-2">
           <Brand />
         </div>
-        <NavLinks />
+        <Suspense fallback={null}>
+          <NavLinks />
+        </Suspense>
       </aside>
 
       <dialog
@@ -46,7 +48,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Icon name="close" />
           </Button>
         </div>
-        <NavLinks onNavigate={() => setDrawerOpen(false)} />
+        <Suspense fallback={null}>
+          <NavLinks onNavigate={() => setDrawerOpen(false)} />
+        </Suspense>
       </dialog>
 
       <div className="flex min-w-0 flex-col">

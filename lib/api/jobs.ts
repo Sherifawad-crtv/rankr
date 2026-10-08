@@ -1,10 +1,10 @@
 import { mockJobs } from "@/lib/mocks/data";
-import { simulateLatency } from "@/lib/mocks/latency";
+import { simulateLatency, simulateList } from "@/lib/mocks/latency";
 import type { Job, JobInput } from "@/types";
 
 // TODO(backend): wire to real endpoint
 export async function listJobs(): Promise<Job[]> {
-  return simulateLatency(mockJobs);
+  return simulateList(mockJobs);
 }
 
 // TODO(backend): wire to real endpoint

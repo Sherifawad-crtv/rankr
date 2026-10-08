@@ -17,6 +17,14 @@ const sizes: Record<Size, string> = {
   lg: "h-12 px-6 text-base",
 };
 
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+
+/** Button styling for non-button elements such as links. */
+export function buttonClass(variant: Variant = "primary", size: Size = "md"): string {
+  return cn(base, focusRing, variants[variant], sizes[size]);
+}
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
@@ -32,13 +40,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-        focusRing,
-        variants[variant],
-        sizes[size],
-        className,
-      )}
+      className={cn(buttonClass(variant, size), className)}
       {...rest}
     />
   );

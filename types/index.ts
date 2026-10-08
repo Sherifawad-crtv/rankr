@@ -37,6 +37,13 @@ export interface SessionUser extends Member {
 
 export type ScoreDimension = "skills" | "experience" | "education" | "profileQuality";
 
+export const SCORE_DIMENSIONS: ScoreDimension[] = [
+  "skills",
+  "experience",
+  "education",
+  "profileQuality",
+];
+
 /** Weights as whole percentages; must total 100. */
 export type ScoreWeights = Record<ScoreDimension, number>;
 
@@ -112,6 +119,12 @@ export interface UploadedCV {
   jobId: string;
   fileName: string;
   status: ProcessingStatus;
+}
+
+/** The CVs submitted together for one job, with their processing progress. */
+export interface ProcessingBatch {
+  jobId: string;
+  files: UploadedCV[];
 }
 
 /** Candidate-facing view: stage only, never scores or rankings. */

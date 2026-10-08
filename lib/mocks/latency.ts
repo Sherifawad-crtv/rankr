@@ -12,3 +12,8 @@ export function simulateLatency<T>(value: T, ms = DEFAULT_LATENCY_MS): Promise<T
   }
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
+
+/** Like simulateLatency, but returns an empty list under the `empty` scenario. */
+export function simulateList<T>(items: T[], ms = DEFAULT_LATENCY_MS): Promise<T[]> {
+  return simulateLatency(getMockScenario() === "empty" ? [] : items, ms);
+}
