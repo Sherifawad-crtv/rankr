@@ -1,37 +1,96 @@
 /*
- * Placeholder design tokens. Neutral values only.
- * TODO(spec): replace with the locked brand colours and type scale.
- * Components reference these tokens (via Tailwind theme names) and never raw values.
+ * Design tokens, derived from the Rankr design-system board.
+ * Primary = blue ramp (interactive-primary is blue-600). Components use the
+ * semantic tokens at the bottom (via the Tailwind theme in app/globals.css),
+ * never ramp steps or raw values.
+ * TODO(spec): fonts (display/body/Arabic) are still to be confirmed.
  */
 :root {
-  --color-surface: #ffffff;
-  --color-surface-muted: #f4f4f5;
-  --color-border: #d4d4d8;
-  --color-text: #18181b;
-  --color-text-muted: #52525b;
-  --color-primary: #3f3f46;
-  --color-primary-contrast: #ffffff;
-  --color-success: #3f6212;
-  --color-warning: #92400e;
-  --color-danger: #991b1b;
+  /* Neutral ramp */
+  --ramp-gray-50: #f1f5f9;
+  --ramp-gray-100: #e2e8f0;
+  --ramp-gray-200: #cbd5e1;
+  --ramp-gray-300: #94a3b8;
+  --ramp-gray-400: #64748b;
+  --ramp-gray-500: #475569;
+  --ramp-gray-600: #334155;
+  --ramp-gray-700: #1e293b;
+  --ramp-gray-800: #0f172a;
 
-  --font-family-base: system-ui, sans-serif;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.25rem;
-  --font-size-xl: 1.75rem;
+  /* Primary ramp (brand blue) */
+  --ramp-blue-50: #eff6ff;
+  --ramp-blue-100: #dbeafe;
+  --ramp-blue-200: #bfdbfe;
+  --ramp-blue-300: #93c5fd;
+  --ramp-blue-400: #60a5fa;
+  --ramp-blue-500: #3b82f6;
+  --ramp-blue-600: #2563eb;
+  --ramp-blue-700: #1d4ed8;
+  --ramp-blue-800: #1e40af;
+  --ramp-blue-900: #1e3a8a;
 
+  /* Accent ramp (amber) */
+  --ramp-amber-50: #fffbeb;
+  --ramp-amber-100: #fef3c7;
+  --ramp-amber-200: #fde68a;
+  --ramp-amber-300: #fcd34d;
+  --ramp-amber-400: #fbbf24;
+  --ramp-amber-500: #f59e0b;
+  --ramp-amber-600: #d97706;
+  --ramp-amber-700: #b45309;
+  --ramp-amber-800: #92400e;
+  --ramp-amber-900: #78350f;
+
+  /* Dark-context surfaces */
+  --ramp-navy-1: #0a1f3a;
+  --ramp-navy-2: #102540;
+  --ramp-navy-3: #162b4d;
+  --ramp-navy-4: #1d3662;
+  --ramp-navy-5: #253e73;
+
+  /* Semantic colour */
+  --color-text-primary: #0a1c36;
+  --color-text-secondary: var(--ramp-gray-400);
+  --color-text-disabled: var(--ramp-gray-300);
+  --color-text-inverse: #ffffff;
+  --color-bg-canvas: #f6f8fa;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: var(--ramp-gray-50);
+  --color-bg-inverse: var(--ramp-navy-1);
+  --color-border-default: var(--ramp-gray-100);
+  --color-border-focus: var(--ramp-blue-600);
+  --color-interactive-primary: var(--ramp-blue-600);
+  --color-interactive-primary-hover: var(--ramp-blue-700);
+  --color-status-match: #16a34a;
+  --color-status-warning: var(--ramp-amber-600);
+  /* TODO(spec): danger colour is not on the board; red-600 is a placeholder. */
+  --color-status-danger: #dc2626;
+
+  /* Spacing scale (4px base) */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
 
-  --radius-sm: 0.25rem;
+  /* Radius */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
-  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.12);
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgb(10 28 54 / 0.06);
+  --shadow-md: 0 4px 12px rgb(10 28 54 / 0.08);
+  --shadow-lg: 0 12px 28px rgb(10 28 54 / 0.12);
+
+  /* Type (TODO(spec): font families) */
+  --font-family-base: system-ui, sans-serif;
 }
