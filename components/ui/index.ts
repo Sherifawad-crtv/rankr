@@ -1,6 +1,7 @@
 export { Badge } from "./badge";
 export { Button } from "./button";
 export { Card } from "./card";
+export { ChoiceChips } from "./choice-chips";
 export { Checkbox } from "./checkbox";
 export { Dialog } from "./dialog";
 export { Grid } from "./grid";

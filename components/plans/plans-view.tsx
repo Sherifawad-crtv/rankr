@@ -46,7 +46,7 @@ export function PlansView() {
     );
   }
 
-  const { pricing } = state;
+  const pricing = state.data;
   const savings = pricing.yearlyDiscountPercent;
   const soloPrice = monthlyPrice(pricing.solo.pricePerMonth, cycle, savings);
   const enterprisePrice = monthlyPrice(pricing.enterpriseTiers[tier], cycle, savings);

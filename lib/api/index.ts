@@ -5,3 +5,4 @@ export * from "./messages";
 export * from "./pricing";
 export * from "./auth";
 export * from "./checkout";
+export * from "./workspace";

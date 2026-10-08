@@ -159,3 +159,19 @@ export interface CreateAccountInput {
   password: string;
   plan: PlanSelection;
 }
+
+export const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "500+"] as const; // TODO(spec): size bands
+export type CompanySize = (typeof COMPANY_SIZES)[number];
+
+export interface AccountProfile {
+  fullName: string;
+  email: string;
+}
+
+export interface WorkspaceInput {
+  companyName: string;
+  companySize: CompanySize;
+  fullName: string;
+  jobTitle: string;
+  plan: PlanSelection;
+}

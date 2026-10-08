@@ -43,7 +43,7 @@ export function CheckoutView({ selection }: { selection: PlanSelection }) {
     );
   }
 
-  const { pricing } = state;
+  const pricing = state.data;
   const baseMonthly =
     selection.plan === "solo" ? pricing.solo.pricePerMonth : pricing.enterpriseTiers[selection.tier!];
   const perMonth = monthlyPrice(baseMonthly, selection.cycle, pricing.yearlyDiscountPercent);
