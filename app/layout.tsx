@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui";
 import { SessionProvider } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col"><SessionProvider>{children}</SessionProvider></body>
+      <body className="min-h-full flex flex-col"><SessionProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </SessionProvider></body>
     </html>
   );
 }
