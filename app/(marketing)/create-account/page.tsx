@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Card } from "@/components/ui";
 import { CreateAccountForm } from "@/components/entry/create-account-form";
 import { parsePlanSelection } from "@/lib/entry-flow";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-export default async function CreateAccountPage({ searchParams }: { searchParams: SearchParams }) {
+async function CreateAccountContent({ searchParams }: { searchParams: SearchParams }) {
   const selection = parsePlanSelection(await searchParams);
 
   if (!selection) {
@@ -20,4 +21,12 @@ export default async function CreateAccountPage({ searchParams }: { searchParams
   }
 
   return <CreateAccountForm selection={selection} />;
+}
+
+export default function CreateAccountPage({ searchParams }: { searchParams: SearchParams }) {
+  return (
+    <Suspense fallback={<p role="status" className="text-center text-text-secondary">Loading…</p>}>
+      <CreateAccountContent searchParams={searchParams} />
+    </Suspense>
+  );
 }
