@@ -1,6 +1,10 @@
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
+  // The sign-up funnel is hidden until it is ready. Set SHOW_ENTRY_FLOW=true to expose it.
+  if (process.env.SHOW_ENTRY_FLOW !== "true") notFound();
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border-default bg-surface px-4 py-4 lg:px-8">
