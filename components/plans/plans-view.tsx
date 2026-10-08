@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Card, Grid, Icon, Segmented, TierSlider } from "@/components/ui";
 import { getPricing } from "@/lib/api";
+import { planQuery } from "@/lib/entry-flow";
 import { monthlyPrice } from "@/lib/pricing";
 import type { BillingCycle, EnterpriseCvTier, PricingCatalog } from "@/types";
 import { PriceDisplay } from "./price-display";
@@ -97,7 +98,7 @@ export function PlansView() {
           <ul className="flex flex-1 flex-col gap-2">
             <PlanFeature>Single user</PlanFeature>
           </ul>
-          <Link href={`/create-account?plan=solo&cycle=${cycle}`} className="contents">
+          <Link href={`/create-account?${planQuery({ plan: "solo", tier: null, cycle })}`} className="contents">
             <Button size="lg">Choose Solo</Button>
           </Link>
         </Card>
@@ -117,7 +118,7 @@ export function PlansView() {
             <PlanFeature>Roles and team messaging</PlanFeature>
           </ul>
           <Link
-            href={`/create-account?plan=enterprise&tier=${tier}&cycle=${cycle}`}
+            href={`/create-account?${planQuery({ plan: "enterprise", tier, cycle })}`}
             className="contents"
           >
             <Button size="lg">Choose Enterprise</Button>

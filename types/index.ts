@@ -144,3 +144,18 @@ export interface PricingCatalog {
   /** Percent off when billed yearly. */
   yearlyDiscountPercent: number | null; // TODO(spec): discount is OPEN
 }
+
+/** The plan chosen on the Plans screen, carried through the entry funnel. */
+export interface PlanSelection {
+  plan: PlanMode;
+  /** Enterprise only. */
+  tier: EnterpriseCvTier | null;
+  cycle: BillingCycle;
+}
+
+export interface CreateAccountInput {
+  fullName: string;
+  email: string;
+  password: string;
+  plan: PlanSelection;
+}
