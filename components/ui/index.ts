@@ -3,6 +3,7 @@ export { Button } from "./button";
 export { Card } from "./card";
 export { Checkbox } from "./checkbox";
 export { Dialog } from "./dialog";
+export { Grid } from "./grid";
 export { Icon, type IconName } from "./icons";
 export { Input, Select, Textarea } from "./input";
 export { Table, Td, Th } from "./table";
