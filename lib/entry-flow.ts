@@ -25,3 +25,8 @@ export function planQuery(selection: PlanSelection): string {
   if (selection.tier !== null) params.set("tier", String(selection.tier));
   return params.toString();
 }
+
+export function parseEmail(params: RawParams): string | null {
+  const email = first(params.email);
+  return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+}

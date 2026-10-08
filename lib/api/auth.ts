@@ -12,3 +12,15 @@ export async function createAccount(input: CreateAccountInput): Promise<void> {
   }
   await simulateLatency(undefined);
 }
+
+// TODO(backend): wire to real endpoint
+export async function resendVerificationEmail(email: string): Promise<void> {
+  void email;
+  await simulateLatency(undefined);
+}
+
+// TODO(backend): wire to real endpoint. The real flow confirms a token from the emailed link.
+export async function verifyEmail(token: string): Promise<void> {
+  void token;
+  await simulateLatency(undefined);
+}
