@@ -6,6 +6,7 @@ export { Dialog } from "./dialog";
 export { Grid } from "./grid";
 export { Icon, type IconName } from "./icons";
 export { Input, Select, Textarea } from "./input";
+export { Segmented } from "./segmented";
 export { Table, Td, Th } from "./table";
 export { Tabs, type TabItem } from "./tabs";
 export { TierSlider } from "./tier-slider";

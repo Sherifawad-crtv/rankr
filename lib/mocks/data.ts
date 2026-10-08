@@ -4,6 +4,7 @@ import {
   type Job,
   type Message,
   type Plan,
+  type PricingCatalog,
   type SessionUser,
 } from "@/types";
 
@@ -112,3 +113,10 @@ export const mockCandidates: Candidate[] = [
 ];
 
 export const mockMessages: Message[] = [];
+
+export const mockPricing: PricingCatalog = {
+  currency: null,
+  solo: { cvCapacity: null, pricePerMonth: null },
+  enterpriseTiers: { 100: null, 500: null, 1000: null, 1500: null },
+  yearlyDiscountPercent: null,
+};

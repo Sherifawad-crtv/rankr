@@ -130,3 +130,17 @@ export interface Message {
   body: string;
   sentAt: string;
 }
+
+/** Public pricing shown on the Plans screen. */
+export interface PricingCatalog {
+  /** TODO(spec): currency is OPEN. */
+  currency: string | null;
+  solo: {
+    cvCapacity: number | null; // TODO(spec): Solo capacity is OPEN
+    pricePerMonth: number | null; // TODO(spec): prices are OPEN
+  };
+  /** Price per month for each Enterprise CV tier. */
+  enterpriseTiers: Record<EnterpriseCvTier, number | null>; // TODO(spec): tier prices are OPEN
+  /** Percent off when billed yearly. */
+  yearlyDiscountPercent: number | null; // TODO(spec): discount is OPEN
+}
