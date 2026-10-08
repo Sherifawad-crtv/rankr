@@ -7,3 +7,4 @@ export * from "./auth";
 export * from "./checkout";
 export * from "./workspace";
 export * from "./uploads";
+export * from "./dashboard";

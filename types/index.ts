@@ -188,3 +188,23 @@ export interface WorkspaceInput {
   jobTitle: string;
   plan: PlanSelection;
 }
+
+export interface DashboardCandidate {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  fullName: string;
+  stage: CandidateStage;
+  lowConfidence: boolean;
+}
+
+export interface DashboardSummary {
+  plan: Plan;
+  jobs: Job[];
+  /** Most recently added first. */
+  recentCandidates: DashboardCandidate[];
+  totalCandidates: number;
+  /** Low-confidence candidates a person should check by hand. */
+  needsReviewCount: number;
+  filteredOutCount: number;
+}

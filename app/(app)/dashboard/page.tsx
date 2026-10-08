@@ -1,5 +1,5 @@
-import { PageHeader } from "@/components/shell/page-header";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
 
 export default function DashboardPage() {
-  return <PageHeader title="Dashboard" description="TODO(spec): build from docs/screens." />;
+  return <DashboardView />;
 }
