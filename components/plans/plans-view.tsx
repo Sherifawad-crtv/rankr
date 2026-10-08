@@ -1,18 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Card, Grid, Icon, Segmented, TierSlider } from "@/components/ui";
-import { getPricing } from "@/lib/api";
 import { planQuery } from "@/lib/entry-flow";
+import { usePricing } from "@/lib/hooks/use-pricing";
 import { monthlyPrice } from "@/lib/pricing";
-import type { BillingCycle, EnterpriseCvTier, PricingCatalog } from "@/types";
+import type { BillingCycle, EnterpriseCvTier } from "@/types";
 import { PriceDisplay } from "./price-display";
-
-type LoadState =
-  | { status: "loading" }
-  | { status: "error" }
-  | { status: "ready"; pricing: PricingCatalog };
 
 const cycleOptions: Array<{ value: BillingCycle; label: string }> = [
   { value: "monthly", label: "Monthly" },
@@ -29,23 +24,9 @@ function PlanFeature({ children }: { children: string }) {
 }
 
 export function PlansView() {
-  const [state, setState] = useState<LoadState>({ status: "loading" });
+  const { state, retry } = usePricing();
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [tier, setTier] = useState<EnterpriseCvTier>(500);
-
-  const fetchPricing = useCallback(() => {
-    getPricing().then(
-      (pricing) => setState({ status: "ready", pricing }),
-      () => setState({ status: "error" }),
-    );
-  }, []);
-
-  useEffect(fetchPricing, [fetchPricing]);
-
-  function retry() {
-    setState({ status: "loading" });
-    fetchPricing();
-  }
 
   if (state.status === "loading") {
     return (

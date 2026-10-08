@@ -19,3 +19,9 @@ export function formatPrice(amount: number, currency: string): string {
     maximumFractionDigits: 2,
   }).format(amount);
 }
+
+/** Amount charged at checkout: one month, or twelve months upfront for yearly. */
+export function billedToday(perMonth: number | null, cycle: BillingCycle): number | null {
+  if (perMonth === null) return null;
+  return cycle === "yearly" ? perMonth * 12 : perMonth;
+}
