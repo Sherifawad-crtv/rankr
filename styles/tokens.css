@@ -1,0 +1,37 @@
+/*
+ * Placeholder design tokens. Neutral values only.
+ * TODO(spec): replace with the locked brand colours and type scale.
+ * Components reference these tokens (via Tailwind theme names) and never raw values.
+ */
+:root {
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f4f5;
+  --color-border: #d4d4d8;
+  --color-text: #18181b;
+  --color-text-muted: #52525b;
+  --color-primary: #3f3f46;
+  --color-primary-contrast: #ffffff;
+  --color-success: #3f6212;
+  --color-warning: #92400e;
+  --color-danger: #991b1b;
+
+  --font-family-base: system-ui, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.12);
+}
