@@ -22,7 +22,8 @@ export function DevSwitcher() {
           onChange={(event) => setRole(event.target.value as UserRole)}
         >
           <option value="recruiter">Recruiter</option>
-          <option value="admin">Admin</option>
+          <option value="company_admin">Company admin</option>
+          <option value="staff">Rankr staff</option>
         </select>
       </label>
       <label className="flex items-center gap-1 text-sm text-text-secondary">

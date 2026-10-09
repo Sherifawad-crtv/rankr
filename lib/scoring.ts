@@ -21,6 +21,14 @@ export function weightedScore(candidate: Candidate, weights: ScoreWeights): numb
 }
 
 /**
+ * The match score shown to recruiters: the weighted score multiplied by parse confidence, so
+ * low-confidence CVs rank lower (they also carry a visible indicator).
+ */
+export function matchScore(candidate: Candidate, weights: ScoreWeights): number {
+  return weightedScore(candidate, weights) * candidate.cv.confidence;
+}
+
+/**
  * Sets one weight and spreads the remainder over the others in proportion, so the
  * total always stays exactly 100. TODO(spec): confirm this is the intended slider behaviour.
  */
@@ -52,7 +60,7 @@ export function rebalanceWeights(
 export function rankCandidates(candidates: Candidate[], weights: ScoreWeights) {
   const ranked = candidates
     .filter((candidate) => !candidate.filteredOut)
-    .sort((a, b) => weightedScore(b, weights) - weightedScore(a, weights));
+    .sort((a, b) => matchScore(b, weights) - matchScore(a, weights));
   const filteredOut = candidates.filter((candidate) => candidate.filteredOut);
   return { ranked, filteredOut };
 }

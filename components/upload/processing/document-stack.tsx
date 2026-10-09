@@ -47,7 +47,7 @@ export function DocumentStack({ icon, stageKey }: { icon: IconName; stageKey: st
       </div>
       <span
         key={stageKey}
-        className="absolute -end-3 -top-3 flex size-11 animate-pop items-center justify-center rounded-full bg-primary text-text-inverse shadow-md"
+        className="absolute -end-3 -top-3 flex size-11 animate-pop items-center justify-center rounded-full bg-primary text-primary-contrast shadow-md"
       >
         <Icon name={icon} variant="bold" size={22} />
       </span>

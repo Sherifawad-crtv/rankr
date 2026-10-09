@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Icon, type IconName } from "./icons";
 import { Skeleton } from "./skeleton";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 /** Skeleton placeholder used while a screen loads. `label` is read out to screen readers. */
 export function LoadingPanel({ label }: { label: string }) {
@@ -36,12 +39,13 @@ function IconBubble({ name, tone }: { name: IconName; tone: "danger" | "primary"
 }
 
 export function ErrorPanel({ message, onRetry }: { message: string; onRetry: () => void }) {
+  const { t } = useLocale();
   return (
     <Card className="mx-auto flex max-w-md animate-fade-up flex-col items-center gap-4 text-center">
       <IconBubble name="alert" tone="danger" />
       <p className="text-base text-text-primary">{message}</p>
       <Button onClick={onRetry}>
-        <Icon name="refresh" size={18} /> Try again
+        <Icon name="refresh" size={18} /> {t("common.tryAgain")}
       </Button>
     </Card>
   );

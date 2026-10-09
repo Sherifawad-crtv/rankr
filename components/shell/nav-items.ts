@@ -1,17 +1,18 @@
 import type { IconName } from "@/components/ui";
+import type { MessageKey } from "@/lib/i18n";
 
 export interface NavItem {
   href: string;
-  label: string;
+  labelKey: MessageKey;
   icon: IconName;
 }
 
 // TODO(spec): confirm nav structure and which items are hidden per role / plan mode.
 export const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "home" },
-  { href: "/jobs", label: "Jobs", icon: "briefcase" },
-  { href: "/messages", label: "Messages", icon: "message" },
-  { href: "/analytics", label: "Analytics", icon: "chart" },
-  { href: "/billing", label: "Billing", icon: "card" },
-  { href: "/settings", label: "Settings", icon: "settings" },
+  { href: "/dashboard", labelKey: "nav.dashboard", icon: "home" },
+  { href: "/jobs", labelKey: "nav.jobs", icon: "briefcase" },
+  { href: "/messages", labelKey: "nav.messages", icon: "message" },
+  { href: "/analytics", labelKey: "nav.analytics", icon: "chart" },
+  { href: "/billing", labelKey: "nav.billing", icon: "card" },
+  { href: "/settings", labelKey: "nav.settings", icon: "settings" },
 ];

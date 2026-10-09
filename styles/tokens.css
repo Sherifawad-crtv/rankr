@@ -57,9 +57,9 @@
   --color-bg-subtle: var(--ramp-gray-50);
   --color-bg-inverse: var(--ramp-navy-1);
   --color-border-default: var(--ramp-gray-100);
-  --color-border-focus: var(--ramp-blue-600);
   --color-interactive-primary: var(--ramp-blue-600);
-  --color-interactive-primary-hover: var(--ramp-blue-700);
+  /* Text and icons that sit on the primary colour. A brand scope may swap this for dark text. */
+  --color-interactive-primary-contrast: #ffffff;
   --color-status-match: #16a34a;
   --color-status-warning: var(--ramp-amber-600);
   /* TODO(spec): danger colour is not on the board; red-600 is a placeholder. */
@@ -101,4 +101,15 @@
   --motion-slow: 450ms;
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*
+ * Tokens derived from the primary colour. Declared on [data-brand] too, so a white-label
+ * scope that overrides --color-interactive-primary re-derives them (custom properties are
+ * resolved where they are declared, not where they are used).
+ */
+:root,
+[data-brand] {
+  --color-border-focus: var(--color-interactive-primary);
+  --color-interactive-primary-hover: color-mix(in srgb, var(--color-interactive-primary) 88%, black);
 }

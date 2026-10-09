@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState, type Ref } from "react";
+import { useCallback, useEffect, useMemo, useState, type Ref } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import {
   AnimatedNumber,
   Badge,
   Card,
+  ConfidenceIndicator,
+  Disclaimer,
   EmptyPanel,
   ErrorPanel,
   Icon,
@@ -17,20 +19,13 @@ import {
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
 import { getJob, listCandidates } from "@/lib/api";
+import { track } from "@/lib/analytics";
 import { useAsync } from "@/lib/hooks/use-async";
 import { useFlip } from "@/lib/hooks/use-flip";
 import { stagger } from "@/components/ui/cn";
-import { rankCandidates, rebalanceWeights, weightedScore } from "@/lib/scoring";
+import { matchScore, rankCandidates, rebalanceWeights } from "@/lib/scoring";
 import { DEFAULT_SCORE_WEIGHTS, type Candidate, type ScoreDimension, type ScoreWeights } from "@/types";
 import { WeightPanel } from "./weight-panel";
-
-function LowConfidenceBadge() {
-  return (
-    <Badge tone="warning" title="We were not confident reading this CV. Review it manually.">
-      Low confidence
-    </Badge>
-  );
-}
 
 export function RankedView({ jobId }: { jobId: string }) {
   const load = useCallback(() => Promise.all([getJob(jobId), listCandidates(jobId)]), [jobId]);
@@ -44,6 +39,11 @@ export function RankedView({ jobId }: { jobId: string }) {
   );
 
   const rowRef = useFlip(ranked.map((candidate) => candidate.id));
+
+  const candidateCount = candidates?.length;
+  useEffect(() => {
+    if (candidateCount !== undefined) track({ name: "ranked_list_viewed", candidates: candidateCount });
+  }, [candidateCount]);
 
   if (state.status === "loading") return <LoadingPanel label="Loading candidates…" />;
   if (state.status === "error") {
@@ -61,6 +61,7 @@ export function RankedView({ jobId }: { jobId: string }) {
   }
 
   function onWeightChange(dimension: ScoreDimension, value: number) {
+    track({ name: "weights_changed" });
     setWeights((current) => rebalanceWeights(current, dimension, value));
   }
 
@@ -73,15 +74,7 @@ export function RankedView({ jobId }: { jobId: string }) {
         </Link>
       </div>
 
-      {/* Human-in-the-loop disclaimer: required wherever scores appear. */}
-      <div
-        role="note"
-        className="flex items-start gap-3 rounded-md border border-border-default bg-subtle p-4 text-sm text-text-secondary"
-      >
-        <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-warning" />
-        Scores are a decision aid, not a decision. A person must review every candidate. Rankr
-        never rejects anyone automatically.
-      </div>
+      <Disclaimer />
 
       {all.length === 0 ? (
         <EmptyPanel
@@ -153,7 +146,7 @@ export function RankedView({ jobId }: { jobId: string }) {
                       <Td>
                         <span className="flex flex-wrap items-center gap-2">
                           {candidate.cv.fullName}
-                          {candidate.lowConfidence && <LowConfidenceBadge />}
+                          {candidate.lowConfidence && <ConfidenceIndicator level="low" />}
                         </span>
                       </Td>
                       <Td>
@@ -194,12 +187,12 @@ function CandidateRow({
       <Td>
         <span className="flex flex-wrap items-center gap-2">
           <span className="font-medium">{candidate.cv.fullName}</span>
-          {candidate.lowConfidence && <LowConfidenceBadge />}
+          {candidate.lowConfidence && <ConfidenceIndicator level="low" />}
         </span>
       </Td>
       <Td>
         <span className="font-display text-lg font-bold text-primary">
-          <AnimatedNumber value={Math.round(weightedScore(candidate, weights))} duration={350} />
+          <AnimatedNumber value={Math.round(matchScore(candidate, weights))} duration={350} />
         </span>
       </Td>
       <Td>{candidate.breakdown.skills}</Td>

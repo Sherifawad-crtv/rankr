@@ -2,17 +2,25 @@
 
 import { useState } from "react";
 import {
+  Avatar,
   Badge,
   Button,
   Card,
   Checkbox,
+  ConfidenceIndicator,
+  ConfirmDialog,
+  DataTable,
   Dialog,
+  Disclaimer,
   Icon,
   Input,
+  MatchScore,
   Segmented,
   Select,
   Skeleton,
+  SkillChip,
   Spinner,
+  StatusPill,
   Table,
   Tabs,
   Td,
@@ -21,14 +29,23 @@ import {
   TierSlider,
   useToast,
 } from "@/components/ui";
+import { BrandScope } from "@/components/brand/brand-scope";
 import { solarIconNames } from "@/components/ui/icon-names";
 import type { BillingCycle, EnterpriseCvTier } from "@/types";
+
+const sampleRows = [
+  { id: "1", name: "Ahmed Hassan", score: 87, stage: "Shortlisted" },
+  { id: "2", name: "Sara Ali", score: 64, stage: "New" },
+  { id: "3", name: "Omar Khaled", score: 41, stage: "New" },
+];
 
 export default function ComponentGallery() {
   const [tier, setTier] = useState<EnterpriseCvTier>(500);
   const [open, setOpen] = useState(false);
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [loading, setLoading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
   const toast = useToast();
 
   return (
@@ -77,6 +94,86 @@ export default function ComponentGallery() {
           <Skeleton className="h-4 w-1/2" />
         </div>
       </Card>
+
+      <Card className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Scores, confidence and skills</h2>
+        <Disclaimer />
+        <div className="flex flex-wrap items-center gap-4">
+          <MatchScore value={87} size="sm" />
+          <MatchScore value={64} />
+          <MatchScore value={41} size="lg" />
+          <ConfidenceIndicator level="high" showLabel />
+          <ConfidenceIndicator level="medium" showLabel />
+          <ConfidenceIndicator level="low" />
+          <Avatar name="Sara" size="md" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <SkillChip label="React" tier="required" state="matched" />
+          <SkillChip label="TypeScript" tier="required" state="missing" />
+          <SkillChip label="Docker" state="extra" />
+          <SkillChip label="Figma" tier="niceToHave" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <StatusPill status="pending" />
+          <StatusPill status="processing" step="reading" />
+          <StatusPill status="done" />
+          <StatusPill status="failed" />
+          <StatusPill status="done" duplicate />
+        </div>
+      </Card>
+
+      <Card className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Data table (sort and select)</h2>
+        <DataTable
+          rows={sampleRows}
+          getRowId={(row) => row.id}
+          getRowLabel={(row) => row.name}
+          defaultSort={{ columnId: "score", direction: "desc" }}
+          selectedIds={selected}
+          onSelectionChange={setSelected}
+          columns={[
+            { id: "name", header: "Candidate", cell: (row) => row.name, sortValue: (row) => row.name },
+            { id: "score", header: "Score", cell: (row) => <MatchScore value={row.score} size="sm" />, sortValue: (row) => row.score },
+            { id: "stage", header: "Stage", cell: (row) => <Badge>{row.stage}</Badge> },
+          ]}
+        />
+        <div>
+          <Button variant="danger" size="sm" onClick={() => setConfirmOpen(true)} disabled={selected.length === 0}>
+            <Icon name="trash" size={16} /> Reject {selected.length || ""} selected
+          </Button>
+        </div>
+        <ConfirmDialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          title="Reject selected candidates?"
+          description="You decide this, not Rankr. Rejected candidates stay in your list and can be moved back."
+          confirmLabel="Reject"
+          tone="danger"
+          onConfirm={() => new Promise((resolve) => setTimeout(resolve, 800))}
+        />
+      </Card>
+
+      <BrandScope branding={{ name: "Example Org", logoUrl: null, primaryColor: "#E11D48" }}>
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">White-label scope (organisation brand colour)</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button>Apply now</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Badge tone="primary">Primary badge</Badge>
+            <MatchScore value={72} size="sm" />
+            <Segmented
+              label="Demo"
+              value="a"
+              onChange={() => undefined}
+              options={[
+                { value: "a", label: "One" },
+                { value: "b", label: "Two" },
+              ]}
+            />
+            <Checkbox defaultChecked label="Consent" />
+          </div>
+        </Card>
+      </BrandScope>
 
       <Card className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Icons (Solar, linear and bold)</h2>

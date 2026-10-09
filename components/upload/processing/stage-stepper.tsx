@@ -34,7 +34,7 @@ export function StageStepper({ progress, active }: StageStepperProps) {
             <span
               className={cn(
                 "relative z-10 flex size-10 items-center justify-center rounded-full border-2 transition-all duration-500 ease-[var(--ease-soft)]",
-                complete && "border-primary bg-primary text-text-inverse",
+                complete && "border-primary bg-primary text-primary-contrast",
                 current && "animate-pulse-ring border-primary bg-surface text-primary",
                 !complete && !current && "border-border-default bg-surface text-text-disabled",
               )}

@@ -89,7 +89,7 @@ function WorkspaceForm({
         <span
           key={companyLabel.charAt(0).toUpperCase()}
           aria-hidden
-          className="flex size-14 shrink-0 animate-pop items-center justify-center rounded-xl bg-primary font-display text-xl font-bold text-text-inverse shadow-md"
+          className="flex size-14 shrink-0 animate-pop items-center justify-center rounded-xl bg-primary font-display text-xl font-bold text-primary-contrast shadow-md"
         >
           {companyLabel.charAt(0).toUpperCase()}
         </span>

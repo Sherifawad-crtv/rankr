@@ -39,7 +39,7 @@ export function Segmented<T extends string>({ label, value, onChange, options }:
             className={cn(
               "relative z-10 rounded-full px-5 py-1.5 text-base font-semibold transition-colors duration-200",
               focusRing,
-              selected ? "text-text-inverse" : "text-text-secondary hover:text-text-primary",
+              selected ? "text-primary-contrast" : "text-text-secondary hover:text-text-primary",
             )}
           >
             {option.label}

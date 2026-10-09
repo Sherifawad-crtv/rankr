@@ -265,11 +265,21 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 
 ## 9. Phased roadmap
 
+**Status:** Phase 1 (contract and foundations) is done. See the checklist under Phase 1 below.
+
 Sizes are relative: S (about a day), M (a few days), L (a week or more).
 
 **Phase 0, align (now):** resolve the 13 conflicts in section 2, confirm fonts, confirm P0 scope. *S*
 
-**Phase 1, contract and foundations:** type refactor, skills catalogue mock, stage rename, i18n and RTL scaffold, analytics and feature-flag stubs, new shared components (ScoreBadge, ConfidenceIndicator, SkillChip, StatusPill, Disclaimer, ConfirmDialog, DataTable). *M-L*
+**Phase 1, contract and foundations (done):** *M-L*
+- [x] Type refactor: skill tiers, structured hard filters, degree levels, `ScreeningRun`, richer `Candidate` (rationale, matched / missing / extra skills, OCR and duplicate flags, English and Arabic names), three roles, `OrgBranding`.
+- [x] Skills catalogue mock and `listSkills()`.
+- [x] Stage rename and confidence-aware match score.
+- [x] i18n scaffold (`useLocale`, English messages, Arabic fallback), RTL direction, remembered language, dev language toggle.
+- [x] White-label scope (`BrandScope`): runtime brand colour with derived hover and focus colours.
+- [x] Analytics and feature-flag stubs.
+- [x] Shared components: `Disclaimer`, `MatchScore`, `ConfidenceIndicator`, `SkillChip`, `StatusPill`, `ConfirmDialog`, `DataTable`, `Avatar`.
+- Still to do as screens are rebuilt: move the remaining hardcoded English strings into `t()` keys.
 
 **Phase 2, the hero loop (P0):** *this is the product*
 1. Job creation wizard with skill picker (L)

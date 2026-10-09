@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
+import { flags } from "@/lib/flags";
 import type { ReactNode } from "react";
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  // The sign-up funnel is hidden until it is ready. Set SHOW_ENTRY_FLOW=true to expose it.
-  if (process.env.SHOW_ENTRY_FLOW !== "true") notFound();
+  // The sign-up funnel is hidden until it is ready. Set SHOW_ENTRY_FLOW=true to expose it (see lib/flags.ts).
+  if (!flags.entryFlow()) notFound();
 
   return (
     <div className="flex min-h-screen flex-col">

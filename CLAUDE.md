@@ -34,6 +34,9 @@ Everything the back-end touches is reached through a **typed service layer** (`l
 - **Deploy target: Vercel.**
 - **Fonts (locked):** Urbanist for UI text, Space Grotesk for headings, numbers and scores (self-hosted via Fontsource). Arabic pairing comes with the Arabic phase.
 - **Icons (locked):** Solar icon set (480 Design, CC BY 4.0), copied into source by `scripts/generate-icons.mjs`. Add an icon by adding a line there and re-running it.
+- **Language:** English first, Arabic (RTL) next. Every user-facing string in new or rebuilt screens goes through `t("key")` from `useLocale()` (keys live in `lib/i18n/messages/en.ts`; Arabic falls back to English until translated). Use logical CSS properties (`ms-`, `ps-`, `text-start`, `start-`), mirror directional icons with `mirrorRtl`, and test both directions.
+- **White-label:** wrap an organisation's pages in `<BrandScope branding={...}>` to swap the primary colour at runtime. Never hardcode the brand blue; use `bg-primary`, `text-primary`, `text-primary-contrast`.
+- **Feature flags:** `lib/flags.ts`. **Analytics:** `track()` in `lib/analytics.ts` (stub).
 - **Motion:** simple and purposeful (Airbnb-style): press and hover feedback, eased page and step transitions, skeleton loading. Always respect `prefers-reduced-motion` (handled globally in `app/globals.css`).
 - State: React state + context for app-level concerns (mock session, plan mode). No heavy state lib unless a screen genuinely needs it — ask first.
 - Forms: a single lightweight form approach, consistent across the app.

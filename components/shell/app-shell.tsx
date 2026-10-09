@@ -1,7 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
-import { Badge, Button, Icon } from "@/components/ui";
+import { Avatar, Badge, Button, Icon } from "@/components/ui";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { LanguageToggle } from "./language-toggle";
 import { useSession } from "@/lib/session";
 import { Logo } from "@/components/brand/logo";
 import { DevSwitcher } from "./dev-switcher";
@@ -13,6 +15,7 @@ function Brand() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useSession();
+  const { t } = useLocale();
   const drawerRef = useRef<HTMLDialogElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -46,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <div className="mb-6 flex items-center justify-between px-3 pt-2">
           <Brand />
-          <Button variant="ghost" size="sm" aria-label="Close menu" onClick={() => setDrawerOpen(false)}>
+          <Button variant="ghost" size="sm" aria-label={t("nav.closeMenu")} onClick={() => setDrawerOpen(false)}>
             <Icon name="close" />
           </Button>
         </div>
@@ -61,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             variant="ghost"
             size="sm"
             className="lg:hidden"
-            aria-label="Open menu"
+            aria-label={t("nav.openMenu")}
             onClick={() => setDrawerOpen(true)}
           >
             <Icon name="menu" />
@@ -70,14 +73,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Brand />
           </div>
           <div className="ms-auto flex flex-wrap items-center gap-3">
+            <LanguageToggle />
             <DevSwitcher />
             <Badge tone="primary">{user.planMode === "solo" ? "Solo" : "Enterprise"}</Badge>
-            <span
-              aria-hidden
-              className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"
-            >
-              {user.name.charAt(0)}
-            </span>
+            <Avatar name={user.name} />
             <span className="sr-only">{user.name}</span>
           </div>
         </header>

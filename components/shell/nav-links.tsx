@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/ui";
+import { useLocale } from "@/lib/i18n/locale-context";
 import { cn, focusRing } from "@/components/ui/cn";
 import { navItems } from "./nav-items";
 
 export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { t } = useLocale();
   return (
-    <nav aria-label="Main" className="flex flex-col gap-1">
+    <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -31,7 +33,7 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               variant={active ? "bold" : "linear"}
               className="transition-transform duration-200 ease-[var(--ease-spring)] group-hover:scale-110"
             />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         );
       })}

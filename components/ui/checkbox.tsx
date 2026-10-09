@@ -1,7 +1,7 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from "react";
+import { useId, type ComponentProps, type ReactNode } from "react";
 import { cn, focusRing } from "./cn";
 
-interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "type"> {
+interface CheckboxProps extends Omit<ComponentProps<"input">, "id" | "type"> {
   label: ReactNode;
 }
 
@@ -29,7 +29,7 @@ export function Checkbox({ label, className, ...rest }: CheckboxProps) {
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="pointer-events-none absolute inset-0 m-auto size-3.5 scale-0 text-text-inverse transition-transform duration-200 ease-[var(--ease-spring)] peer-checked:scale-100"
+          className="pointer-events-none absolute inset-0 m-auto size-3.5 scale-0 text-primary-contrast transition-transform duration-200 ease-[var(--ease-spring)] peer-checked:scale-100"
         >
           <path d="m5 12.5 4.5 4.5L19 7.5" />
         </svg>

@@ -10,18 +10,19 @@ import {
   ErrorPanel,
   Icon,
   LoadingPanel,
-  Spinner,
+  StatusPill,
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
 import { cn, stagger } from "@/components/ui/cn";
 import { getProcessingStatus } from "@/lib/api";
+import { track } from "@/lib/analytics";
 import {
   PIPELINE_STAGES,
   activeStageIndex,
   isFinished,
   stageProgress,
 } from "@/lib/processing";
-import type { ProcessingBatch, ProcessingStatus, ProcessingStep } from "@/types";
+import type { ProcessingBatch } from "@/types";
 import { DocumentStack } from "./processing/document-stack";
 import { RotatingTip } from "./processing/rotating-tip";
 import { StageStepper } from "./processing/stage-stepper";
@@ -32,36 +33,6 @@ type View =
   | { status: "loading" }
   | { status: "error" }
   | { status: "ready"; batch: ProcessingBatch | null };
-
-const stepLabel: Record<ProcessingStep, string> = {
-  detecting: "Checking",
-  reading: "Reading",
-  parsing: "Understanding",
-  scoring: "Scoring",
-};
-
-const statusTone: Record<ProcessingStatus, "neutral" | "primary" | "match" | "danger"> = {
-  pending: "neutral",
-  processing: "primary",
-  done: "match",
-  failed: "danger",
-};
-
-function FileStatus({ status, step }: { status: ProcessingStatus; step: ProcessingStep | null }) {
-  if (status === "processing") {
-    return (
-      <Badge tone="primary" className="gap-1.5">
-        <Spinner className="size-3" /> {step ? stepLabel[step] : "Working"}
-      </Badge>
-    );
-  }
-  const label: Record<Exclude<ProcessingStatus, "processing">, string> = {
-    pending: "Waiting",
-    done: "Scored",
-    failed: "Couldn't read",
-  };
-  return <Badge tone={statusTone[status]}>{label[status as Exclude<ProcessingStatus, "processing">]}</Badge>;
-}
 
 export function ProcessingView({ jobId }: { jobId: string }) {
   const [view, setView] = useState<View>({ status: "loading" });
@@ -76,7 +47,15 @@ export function ProcessingView({ jobId }: { jobId: string }) {
         const batch = await getProcessingStatus(jobId);
         if (cancelled) return;
         setView({ status: "ready", batch });
-        if (batch && !isFinished(batch.files)) timer = setTimeout(tick, POLL_MS);
+        if (batch && !isFinished(batch.files)) {
+          timer = setTimeout(tick, POLL_MS);
+        } else if (batch) {
+          track({
+            name: "run_completed",
+            total: batch.files.length,
+            failed: batch.files.filter((file) => file.status === "failed").length,
+          });
+        }
       } catch {
         if (!cancelled) setView({ status: "error" });
       }
@@ -198,7 +177,7 @@ export function ProcessingView({ jobId }: { jobId: string }) {
             >
               <Icon name="file" size={18} className="text-text-secondary" />
               <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.fileName}</span>
-              <FileStatus status={file.status} step={file.step} />
+              <StatusPill status={file.status} step={file.step} duplicate={file.isDuplicate} />
             </li>
           ))}
         </ul>

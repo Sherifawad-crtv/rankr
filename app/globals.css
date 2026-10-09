@@ -14,6 +14,7 @@
   --color-border-focus: var(--color-border-focus);
   --color-primary: var(--color-interactive-primary);
   --color-primary-hover: var(--color-interactive-primary-hover);
+  --color-primary-contrast: var(--color-interactive-primary-contrast);
   --color-match: var(--color-status-match);
   --color-warning: var(--color-status-warning);
   --color-danger: var(--color-status-danger);

@@ -5,7 +5,14 @@
  */
 
 export type PlanMode = "solo" | "enterprise";
-export type UserRole = "admin" | "recruiter";
+/** Rankr staff see every company; company admins manage their workspace; recruiters screen CVs. */
+export type UserRole = "staff" | "company_admin" | "recruiter";
+export type Locale = "en" | "ar";
+/** Text that exists in both supported languages. Arabic may be missing. */
+export interface LocalizedText {
+  en: string;
+  ar?: string;
+}
 export type BillingCycle = "monthly" | "yearly";
 
 /** Enterprise CV-capacity tiers per cycle (draggable 4-stop control). */
@@ -57,10 +64,35 @@ export const DEFAULT_SCORE_WEIGHTS: ScoreWeights = {
 /** Per-dimension scores, 0-100. */
 export type ScoreBreakdown = Record<ScoreDimension, number>;
 
-export interface HardFilter {
+/** A skill from the canonical catalogue (~300 skills, English and Arabic aliases). */
+export interface Skill {
   id: string;
-  label: string;
+  name: LocalizedText;
+  /** Alternative spellings that resolve to this skill, e.g. "ReactJS", "React.js". */
+  aliases: string[];
 }
+
+export type SkillRef = Pick<Skill, "id" | "name">;
+
+/** Required skills weigh most, then preferred, then nice-to-have. */
+export type SkillTier = "required" | "preferred" | "niceToHave";
+export const SKILL_TIERS: SkillTier[] = ["required", "preferred", "niceToHave"];
+
+export interface JobSkill {
+  skill: SkillRef;
+  tier: SkillTier;
+}
+
+export type DegreeLevel = "none" | "diploma" | "bachelor" | "master" | "doctorate"; // TODO(spec): degree levels
+export const DEGREE_LEVELS: DegreeLevel[] = ["none", "diploma", "bachelor", "master", "doctorate"];
+
+/** A knock-out rule. Candidates who fail stay visible in the "filtered out" group with the reason. */
+export type HardFilter =
+  | { id: string; kind: "requiredSkills"; skills: SkillRef[] }
+  | { id: string; kind: "minExperienceYears"; years: number }
+  | { id: string; kind: "minDegree"; level: DegreeLevel }
+  | { id: string; kind: "location"; value: string }
+  | { id: string; kind: "workAuthorization" }; // TODO(spec): exact work-authorisation wording
 
 export interface Job {
   id: string;
@@ -68,27 +100,46 @@ export interface Job {
   description: string;
   location: string;
   status: "draft" | "open" | "closed";
+  skills: JobSkill[];
+  minExperienceYears: number;
+  degreeLevel: DegreeLevel;
   hardFilters: HardFilter[];
   weights: ScoreWeights;
   candidateCount: number;
   createdAt: string;
 }
 
-export interface JobInput {
-  title: string;
-  description: string;
-  location: string;
-  hardFilters: HardFilter[];
-  weights: ScoreWeights;
+export type JobInput = Pick<
+  Job,
+  | "title"
+  | "description"
+  | "location"
+  | "skills"
+  | "minExperienceYears"
+  | "degreeLevel"
+  | "hardFilters"
+  | "weights"
+>;
+
+export type LanguageLevel = "basic" | "conversational" | "fluent" | "native";
+
+/** A skill as read from the CV. `skillId` is null when it could not be mapped to the catalogue. */
+export interface ParsedSkill {
+  skillId: string | null;
+  label: string;
 }
 
 export interface ParsedCV {
+  /** English (transliterated) name. */
   fullName: string;
+  fullNameAr: string | null;
   email: string;
   phone: string | null;
-  skills: string[];
+  skills: ParsedSkill[];
   experienceYears: number;
-  education: string[];
+  roles: Array<{ title: string; company: string; period: string }>;
+  education: Array<{ degree: DegreeLevel; field: string; institution: string }>;
+  languages: Array<{ language: string; level: LanguageLevel }>;
   /** Parse confidence, 0-1. */
   confidence: number;
 }
@@ -99,10 +150,20 @@ export type CandidateStage = "new" | "shortlisted" | "rejected" | "hired";
 export interface Candidate {
   id: string;
   jobId: string;
+  runId: string;
   cv: ParsedCV;
   breakdown: ScoreBreakdown;
+  /** Why this candidate scored as they did, in one or two plain sentences. */
+  rationale: string;
+  matchedSkills: SkillRef[];
+  missingRequiredSkills: SkillRef[];
+  extraSkills: SkillRef[];
   stage: CandidateStage;
   lowConfidence: boolean;
+  /** The CV was a scanned PDF and went through OCR. */
+  ocrUsed: boolean;
+  /** Set when this CV matches one already processed (SHA-256); the earlier result is reused. */
+  duplicateOf: string | null;
   /** Set when a hard filter knocked the candidate out; they stay visible with the reason. */
   filteredOut: { reason: string } | null;
 }
@@ -121,11 +182,29 @@ export interface UploadedCV {
   status: ProcessingStatus;
   /** Set while status is "processing", otherwise null. */
   step: ProcessingStep | null;
+  /** Identical to a CV already processed; the earlier result is reused. */
+  isDuplicate: boolean;
+  /** Plain-language reason, set when status is "failed". */
+  error: string | null;
+}
+
+/** One batch of CVs uploaded together for a job (up to 500). */
+export interface ScreeningRun {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  createdAt: string;
+  status: "processing" | "completed";
+  total: number;
+  scored: number;
+  failed: number;
+  duplicates: number;
 }
 
 /** The CVs submitted together for one job, with their processing progress. */
 export interface ProcessingBatch {
   jobId: string;
+  runId: string;
   files: UploadedCV[];
 }
 
@@ -209,4 +288,13 @@ export interface DashboardSummary {
   /** Low-confidence candidates a person should check by hand. */
   needsReviewCount: number;
   filteredOutCount: number;
+}
+
+/** Per-organisation look for the white-label candidate portal. */
+export interface OrgBranding {
+  name: string;
+  /** Logo image URL, or null to show the name as text. */
+  logoUrl: string | null;
+  /** Brand colour as a 6-digit hex, e.g. "#2563EB". */
+  primaryColor: string;
 }

@@ -7,6 +7,7 @@ import { stagger } from "@/components/ui/cn";
 import {
   AnimatedNumber,
   Badge,
+  ConfidenceIndicator,
   Card,
   EmptyPanel,
   ErrorPanel,
@@ -172,7 +173,7 @@ export function DashboardView() {
                       <p className="truncate text-sm text-text-secondary">{candidate.jobTitle}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {candidate.lowConfidence && <Badge tone="warning">Low confidence</Badge>}
+                      {candidate.lowConfidence && <ConfidenceIndicator level="low" />}
                       <Badge>{candidate.stage}</Badge>
                     </div>
                   </li>

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui";
 import { getJob, getPlan, submitCVBatch } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
+import { track } from "@/lib/analytics";
 import { useSession } from "@/lib/session";
 import { Dropzone } from "./dropzone";
 
@@ -90,6 +91,7 @@ export function UploadView({ jobId }: { jobId: string }) {
     setSubmitError(false);
     try {
       await submitCVBatch(jobId, files);
+      track({ name: "cv_batch_submitted", count: files.length });
       router.push(`/jobs/${jobId}/processing`);
     } catch {
       setSubmitError(true);
