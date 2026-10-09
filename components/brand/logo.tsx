@@ -2,7 +2,7 @@ import Image from "next/image";
 
 // TODO(brand): replace the PNGs with an SVG export of the logo for crisp scaling.
 const LOGO = { src: "/brand/rankr-logo.png", width: 410, height: 99 };
-const MARK = { src: "/brand/rankr-mark.png", width: 94, height: 99 };
+const MARK = { src: "/brand/rankr-mark.png", width: 512, height: 512 };
 
 /** Full Rankr wordmark. `height` is in px; width follows the aspect ratio. */
 export function Logo({ height = 28 }: { height?: number }) {
