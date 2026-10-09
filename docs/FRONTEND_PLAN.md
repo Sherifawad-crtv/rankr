@@ -292,7 +292,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 
 **Phase 3, accounts:** *L*
 - [x] Sign-in (email and Google), forgot password, reset password, sign-out, persistent mock session, optional route guard.
-- [ ] Re-align the entry funnel with the PRD (sign-up, verify email, checkout, workspace setup, invite team, welcome).
+- [x] Entry funnel re-aligned: translated, progress bar, Google sign-up, Invite team (Enterprise only), Welcome, signs you in on workspace creation.
 - [ ] Settings: profile, company, notifications, team and roles.
 - [ ] Delete-my-data flow.
 - [ ] Billing.

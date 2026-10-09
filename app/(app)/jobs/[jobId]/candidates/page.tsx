@@ -1,3 +1,4 @@
+import { PageFallback } from "@/components/ui";
 import { Suspense } from "react";
 import { RankedView } from "@/components/ranking/ranked-view";
 
@@ -12,7 +13,7 @@ async function CandidatesContent({
 
 export default function CandidatesPage(props: PageProps<"/jobs/[jobId]/candidates">) {
   return (
-    <Suspense fallback={<p role="status" className="py-12 text-center text-text-secondary">Loading…</p>}>
+    <Suspense fallback={<PageFallback />}>
       <CandidatesContent params={props.params} />
     </Suspense>
   );

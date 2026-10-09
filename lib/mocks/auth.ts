@@ -1,4 +1,4 @@
-import type { SessionUser, UserRole } from "@/types";
+import type { AccountProfile, SessionUser, UserRole } from "@/types";
 
 /**
  * Mock accounts. Any email signs in, with these exceptions so every state can be seen:
@@ -28,4 +28,15 @@ export function userForEmail(email: string): SessionUser {
     role: roleForEmail(email),
     planMode: "enterprise",
   };
+}
+
+/** The account just created or signed in with Google, so later funnel steps can use its name and email. */
+let pendingAccount: AccountProfile = { fullName: "Mock Recruiter", email: "recruiter@example.com" };
+
+export function rememberAccount(account: AccountProfile): void {
+  pendingAccount = account;
+}
+
+export function currentAccount(): AccountProfile {
+  return pendingAccount;
 }

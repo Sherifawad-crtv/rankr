@@ -12,6 +12,7 @@ export { PasswordInput } from "./password-input";
 export { Segmented } from "./segmented";
 export { EmptyPanel, ErrorPanel, LoadingPanel } from "./state-panels";
 export { Skeleton } from "./skeleton";
+export { PageFallback } from "./page-fallback";
 export { Spinner } from "./spinner";
 export { StepTransition, type StepDirection } from "./step-transition";
 export { Table, Td, Th } from "./table";

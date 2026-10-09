@@ -1,3 +1,4 @@
+import { PageFallback } from "@/components/ui";
 import { Suspense } from "react";
 import { UploadView } from "@/components/upload/upload-view";
 
@@ -8,7 +9,7 @@ async function UploadContent({ params }: { params: PageProps<"/jobs/[jobId]/uplo
 
 export default function UploadPage(props: PageProps<"/jobs/[jobId]/upload">) {
   return (
-    <Suspense fallback={<p role="status" className="py-12 text-center text-text-secondary">Loading…</p>}>
+    <Suspense fallback={<PageFallback />}>
       <UploadContent params={props.params} />
     </Suspense>
   );

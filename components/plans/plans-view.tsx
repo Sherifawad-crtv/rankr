@@ -2,17 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button, Card, Grid, Icon, Segmented, TierSlider } from "@/components/ui";
+import { Button, Card, ErrorPanel, Grid, Icon, LoadingPanel, Segmented, TierSlider } from "@/components/ui";
+import { useLocale } from "@/lib/i18n/locale-context";
 import { planQuery } from "@/lib/entry-flow";
 import { usePricing } from "@/lib/hooks/use-pricing";
 import { monthlyPrice } from "@/lib/pricing";
 import type { BillingCycle, EnterpriseCvTier } from "@/types";
 import { PriceDisplay } from "./price-display";
-
-const cycleOptions: Array<{ value: BillingCycle; label: string }> = [
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
 
 function PlanFeature({ children }: { children: string }) {
   return (
@@ -24,27 +20,13 @@ function PlanFeature({ children }: { children: string }) {
 }
 
 export function PlansView() {
+  const { t } = useLocale();
   const { state, retry } = usePricing();
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [tier, setTier] = useState<EnterpriseCvTier>(500);
 
-  if (state.status === "loading") {
-    return (
-      <p role="status" className="text-center text-text-secondary">
-        Loading plans…
-      </p>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <Card className="mx-auto flex max-w-md flex-col items-center gap-4 text-center">
-        <Icon name="alert" size={28} className="text-danger" />
-        <p className="text-base text-text-primary">We couldn&apos;t load the plans.</p>
-        <Button onClick={retry}>Try again</Button>
-      </Card>
-    );
-  }
+  if (state.status === "loading") return <LoadingPanel label={t("plans.loading")} />;
+  if (state.status === "error") return <ErrorPanel message={t("plans.error")} onRetry={retry} />;
 
   const pricing = state.data;
   const savings = pricing.yearlyDiscountPercent;
@@ -54,16 +36,24 @@ export function PlansView() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-xl font-bold text-text-primary">Choose your plan</h1>
+        <h1 className="text-xl font-bold text-text-primary">{t("plans.title")}</h1>
         <p className="max-w-xl text-base text-text-secondary">
-          Pricing is based on CV capacity per cycle, not seats.
+          {t("plans.subtitle")}
         </p>
-        <Segmented label="Billing cycle" value={cycle} onChange={setCycle} options={cycleOptions} />
+        <Segmented
+          label={t("plans.cycle")}
+          value={cycle}
+          onChange={setCycle}
+          options={[
+            { value: "monthly", label: t("plans.monthly") },
+            { value: "yearly", label: t("plans.yearly") },
+          ]}
+        />
       </div>
 
       <Grid>
         <Card className="col-span-4 flex flex-col gap-6 lg:col-span-5 lg:col-start-2">
-          <h2 className="text-lg font-semibold text-text-primary">Solo</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{t("plans.solo")}</h2>
           <PriceDisplay
             perMonth={soloPrice}
             currency={pricing.currency}
@@ -73,19 +63,19 @@ export function PlansView() {
           <p className="text-base text-text-secondary">
             {/* TODO(spec): Solo capacity is OPEN */}
             {pricing.solo.cvCapacity === null
-              ? "CV capacity to be confirmed"
-              : `${pricing.solo.cvCapacity} CVs per cycle`}
+              ? t("plans.capacityTbc")
+              : t("plans.capacity", { count: pricing.solo.cvCapacity })}
           </p>
           <ul className="flex flex-1 flex-col gap-2">
-            <PlanFeature>Single user</PlanFeature>
+            <PlanFeature>{t("plans.solo.f1")}</PlanFeature>
           </ul>
           <Link href={`/create-account?${planQuery({ plan: "solo", tier: null, cycle })}`} className="contents">
-            <Button size="lg">Choose Solo</Button>
+            <Button size="lg">{t("plans.chooseSolo")}</Button>
           </Link>
         </Card>
 
         <Card className="col-span-4 flex flex-col gap-6 lg:col-span-5">
-          <h2 className="text-lg font-semibold text-text-primary">Enterprise</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{t("plans.enterprise")}</h2>
           <TierSlider value={tier} onChange={setTier} />
           <PriceDisplay
             perMonth={enterprisePrice}
@@ -94,15 +84,15 @@ export function PlansView() {
             savingsPercent={savings}
           />
           <ul className="flex flex-1 flex-col gap-2">
-            <PlanFeature>Unlimited members</PlanFeature>
-            <PlanFeature>CV capacity shared across the team</PlanFeature>
-            <PlanFeature>Roles and team messaging</PlanFeature>
+            <PlanFeature>{t("plans.enterprise.f1")}</PlanFeature>
+            <PlanFeature>{t("plans.enterprise.f2")}</PlanFeature>
+            <PlanFeature>{t("plans.enterprise.f3")}</PlanFeature>
           </ul>
           <Link
             href={`/create-account?${planQuery({ plan: "enterprise", tier, cycle })}`}
             className="contents"
           >
-            <Button size="lg">Choose Enterprise</Button>
+            <Button size="lg">{t("plans.chooseEnterprise")}</Button>
           </Link>
         </Card>
       </Grid>

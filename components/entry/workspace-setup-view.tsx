@@ -3,14 +3,26 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { Button, Card, ChoiceChips, Icon, Input, StepTransition, type StepDirection } from "@/components/ui";
+import {
+  Button,
+  Card,
+  ChoiceChips,
+  ErrorPanel,
+  Icon,
+  Input,
+  LoadingPanel,
+  StepTransition,
+  type StepDirection,
+} from "@/components/ui";
 import { createWorkspace } from "@/lib/api";
 import { planQuery } from "@/lib/entry-flow";
 import { useAccountProfile } from "@/lib/hooks/use-account-profile";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { useSession } from "@/lib/session";
 import { COMPANY_SIZES, type AccountProfile, type CompanySize, type PlanSelection } from "@/types";
 import { StepProgress } from "./step-progress";
 
-const STEPS = ["Company", "You", "Launch"];
+const STEP_KEYS = ["workspace.step.company", "workspace.step.you", "workspace.step.launch"] as const;
 
 interface Errors {
   companyName?: string;
@@ -28,6 +40,8 @@ function WorkspaceForm({
   selection: PlanSelection;
 }) {
   const router = useRouter();
+  const session = useSession();
+  const { t } = useLocale();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState<StepDirection>("forward");
   const [companyName, setCompanyName] = useState("");
@@ -37,25 +51,25 @@ function WorkspaceForm({
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  const companyLabel = companyName.trim() || "Your company";
+  const companyLabel = companyName.trim() || t("workspace.defaultName");
   const firstName = fullName.trim().split(" ")[0] || "there";
 
   function validateStep(): Errors {
     const found: Errors = {};
     if (step === 0) {
-      if (!companyName.trim()) found.companyName = "What should we call your workspace?";
-      if (!companySize) found.companySize = "Pick the closest size.";
+      if (!companyName.trim()) found.companyName = t("workspace.error.name");
+      if (!companySize) found.companySize = t("workspace.error.size");
     }
     if (step === 1) {
-      if (!fullName.trim()) found.fullName = "Enter your name.";
-      if (!jobTitle.trim()) found.jobTitle = "Tell us your role.";
+      if (!fullName.trim()) found.fullName = t("workspace.error.yourName");
+      if (!jobTitle.trim()) found.jobTitle = t("workspace.error.role");
     }
     return found;
   }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (step < STEPS.length - 1) {
+    if (step < STEP_KEYS.length - 1) {
       const found = validateStep();
       setErrors(found);
       if (Object.keys(found).length === 0) {
@@ -68,17 +82,18 @@ function WorkspaceForm({
     setSubmitting(true);
     setErrors({});
     try {
-      await createWorkspace({
+      const admin = await createWorkspace({
         companyName: companyName.trim(),
         companySize: companySize!,
         fullName: fullName.trim(),
         jobTitle: jobTitle.trim(),
         plan: selection,
       });
+      session.signIn(admin);
       const next = selection.plan === "enterprise" ? "/invite-team" : "/welcome";
       router.push(`${next}?${planQuery(selection)}`);
     } catch {
-      setErrors({ form: "We couldn't create your workspace. Please try again." });
+      setErrors({ form: t("workspace.createError") });
       setSubmitting(false);
     }
   }
@@ -95,24 +110,24 @@ function WorkspaceForm({
         </span>
         <div className="min-w-0">
           <p className="truncate text-lg font-semibold text-text-primary">{companyLabel}</p>
-          <p className="text-sm text-text-secondary">Your new Rankr workspace</p>
+          <p className="text-sm text-text-secondary">{t("workspace.tagline")}</p>
         </div>
       </div>
 
-      <StepProgress steps={STEPS} current={step} />
+      <StepProgress steps={STEP_KEYS.map((key) => t(key))} current={step} label={t("workspace.progress")} />
 
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
         <StepTransition stepKey={step} direction={direction} className="flex flex-col gap-4">
           {step === 0 && (
             <>
               <div>
-                <h1 className="text-xl font-bold text-text-primary">Let&apos;s name your workspace</h1>
+                <h1 className="text-xl font-bold text-text-primary">{t("workspace.company.title")}</h1>
                 <p className="mt-1 text-base text-text-secondary">
-                  This is where your team will rank and review CVs.
+                  {t("workspace.company.subtitle")}
                 </p>
               </div>
               <Input
-                label="Company name"
+                label={t("workspace.company.name")}
                 autoComplete="organization"
                 autoFocus
                 value={companyName}
@@ -120,7 +135,7 @@ function WorkspaceForm({
                 error={errors.companyName}
               />
               <ChoiceChips
-                label="Company size"
+                label={t("workspace.company.size")}
                 options={COMPANY_SIZES}
                 value={companySize}
                 onChange={setCompanySize}
@@ -132,13 +147,13 @@ function WorkspaceForm({
           {step === 1 && (
             <>
               <div>
-                <h1 className="text-xl font-bold text-text-primary">Nice to meet you!</h1>
+                <h1 className="text-xl font-bold text-text-primary">{t("workspace.you.title")}</h1>
                 <p className="mt-1 text-base text-text-secondary">
-                  A little about you, so colleagues know who&apos;s who.
+                  {t("workspace.you.subtitle")}
                 </p>
               </div>
               <Input
-                label="Your name"
+                label={t("workspace.you.name")}
                 autoComplete="name"
                 autoFocus
                 value={fullName}
@@ -146,14 +161,19 @@ function WorkspaceForm({
                 error={errors.fullName}
               />
               <Input
-                label="Your role"
+                label={t("workspace.you.role")}
                 autoComplete="organization-title"
-                placeholder="e.g. HR Manager"
+                placeholder={t("workspace.you.rolePlaceholder")}
                 value={jobTitle}
                 onChange={(event) => setJobTitle(event.target.value)}
                 error={errors.jobTitle}
               />
-              <Input label="Work email" value={profile.email} readOnly hint="Verified at sign-up." />
+              <Input
+                label={t("workspace.you.email")}
+                value={profile.email}
+                readOnly
+                hint={t("workspace.you.emailHint")}
+              />
             </>
           )}
 
@@ -161,18 +181,18 @@ function WorkspaceForm({
             <>
               <div>
                 <h1 className="text-xl font-bold text-text-primary">
-                  Ready to launch, {firstName}?
+                  {t("workspace.launch.title", { name: firstName })}
                 </h1>
                 <p className="mt-1 text-base text-text-secondary">
-                  Here&apos;s what we&apos;ll set up. You can change all of this later.
+                  {t("workspace.launch.subtitle")}
                 </p>
               </div>
               <dl className="rounded-md bg-subtle px-4">
                 {[
-                  ["Company", companyName.trim()],
-                  ["Size", `${companySize} people`],
-                  ["You", `${fullName.trim()}, ${jobTitle.trim()}`],
-                  ["Email", profile.email],
+                  [t("workspace.recap.company"), companyName.trim()],
+                  [t("workspace.recap.size"), t("workspace.recap.sizeValue", { size: companySize ?? "" })],
+                  [t("workspace.recap.you"), `${fullName.trim()}, ${jobTitle.trim()}`],
+                  [t("workspace.recap.email"), profile.email],
                 ].map(([label, value]) => (
                   <div
                     key={label}
@@ -202,17 +222,17 @@ function WorkspaceForm({
               }}
               disabled={submitting}
             >
-              <Icon name="chevron-right" size={16} className="rotate-180 rtl:rotate-0" /> Back
+              <Icon name="chevron-right" size={16} className="rotate-180 rtl:rotate-0" /> {t("common.back")}
             </Button>
           ) : (
             <span />
           )}
           <Button type="submit" size="lg" loading={submitting}>
-            {step < STEPS.length - 1
-              ? "Continue"
+            {step < STEP_KEYS.length - 1
+              ? t("common.continue")
               : submitting
-                ? "Creating workspace…"
-                : "Create workspace"}
+                ? t("workspace.creating")
+                : t("workspace.create")}
           </Button>
         </div>
       </form>
@@ -221,26 +241,18 @@ function WorkspaceForm({
 }
 
 export function WorkspaceSetupView({ selection }: { selection: PlanSelection }) {
+  const { t } = useLocale();
   const { state, retry } = useAccountProfile();
 
-  if (state.status === "loading") {
-    return (
-      <p role="status" className="text-center text-text-secondary">
-        Getting things ready…
-      </p>
-    );
-  }
-
+  if (state.status === "loading") return <LoadingPanel label={t("workspace.loading")} />;
   if (state.status === "error") {
     return (
-      <Card className="mx-auto flex max-w-md flex-col items-center gap-4 text-center">
-        <Icon name="alert" size={28} className="text-danger" />
-        <p className="text-base text-text-primary">We couldn&apos;t load your account.</p>
-        <Button onClick={retry}>Try again</Button>
-        <Link href="/plans" className="text-sm font-medium text-primary hover:underline">
-          Back to plans
+      <div className="flex flex-col items-center gap-4">
+        <ErrorPanel message={t("workspace.profileError")} onRetry={retry} />
+        <Link href="/plans" className="text-sm font-semibold text-primary hover:underline">
+          {t("workspace.backToPlans")}
         </Link>
-      </Card>
+      </div>
     );
   }
 

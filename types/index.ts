@@ -332,3 +332,18 @@ export interface OrgBranding {
   /** Brand colour as a 6-digit hex, e.g. "#2563EB". */
   primaryColor: string;
 }
+
+export interface Workspace {
+  companyName: string;
+  companySize: CompanySize;
+  plan: PlanSelection;
+}
+
+/** Roles a teammate can be invited as. TODO(spec): what each role is allowed to do. */
+export type InviteRole = Extract<UserRole, "company_admin" | "recruiter">;
+export const INVITE_ROLES: InviteRole[] = ["recruiter", "company_admin"];
+
+export interface MemberInvite {
+  email: string;
+  role: InviteRole;
+}

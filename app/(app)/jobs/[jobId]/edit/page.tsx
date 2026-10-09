@@ -1,3 +1,4 @@
+import { PageFallback } from "@/components/ui";
 import { Suspense } from "react";
 import { JobWizardLoader } from "@/components/jobs/wizard/job-wizard-loader";
 
@@ -8,7 +9,7 @@ async function EditContent({ params }: { params: PageProps<"/jobs/[jobId]/edit">
 
 export default function EditJobPage(props: PageProps<"/jobs/[jobId]/edit">) {
   return (
-    <Suspense fallback={<p role="status" className="py-12 text-center text-text-secondary">Loading…</p>}>
+    <Suspense fallback={<PageFallback />}>
       <EditContent params={props.params} />
     </Suspense>
   );

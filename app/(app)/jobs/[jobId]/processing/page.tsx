@@ -1,3 +1,4 @@
+import { PageFallback } from "@/components/ui";
 import { Suspense } from "react";
 import { ProcessingView } from "@/components/upload/processing-view";
 
@@ -12,7 +13,7 @@ async function ProcessingContent({
 
 export default function ProcessingPage(props: PageProps<"/jobs/[jobId]/processing">) {
   return (
-    <Suspense fallback={<p role="status" className="py-12 text-center text-text-secondary">Loading…</p>}>
+    <Suspense fallback={<PageFallback />}>
       <ProcessingContent params={props.params} />
     </Suspense>
   );

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Icon } from "@/components/ui";
 import { resendVerificationEmail, verifyEmail } from "@/lib/api";
 import { planQuery } from "@/lib/entry-flow";
+import { useLocale } from "@/lib/i18n/locale-context";
 import type { PlanSelection } from "@/types";
 
 // TODO(spec): link vs code verification, and the resend cooldown, are not specified.
@@ -15,6 +16,7 @@ type ResendState = "idle" | "sending" | "sent" | "error";
 
 export function VerifyEmailView({ email, selection }: { email: string; selection: PlanSelection }) {
   const router = useRouter();
+  const { t } = useLocale();
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
   const [resend, setResend] = useState<ResendState>("idle");
   const [simulating, setSimulating] = useState(false);
@@ -44,15 +46,13 @@ export function VerifyEmailView({ email, selection }: { email: string; selection
 
   return (
     <Card className="mx-auto flex w-full max-w-md flex-col items-center gap-6 text-center">
-      <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Icon name="message" size={24} />
+      <span className="flex size-14 animate-pop items-center justify-center rounded-full bg-primary/10 text-primary">
+        <Icon name="mail" variant="bold" size={28} />
       </span>
       <div className="flex flex-col gap-2">
-        <h1 className="text-xl font-bold text-text-primary">Check your inbox</h1>
+        <h1 className="text-xl font-bold text-text-primary">{t("verify.title")}</h1>
         <p className="text-base text-text-secondary">
-          We sent a verification link to{" "}
-          <span className="font-medium text-text-primary">{email}</span>. Open it to continue to
-          checkout.
+          {t("verify.before")} <span className="font-semibold text-text-primary">{email}</span>. {t("verify.after")}
         </p>
       </div>
 
@@ -64,26 +64,26 @@ export function VerifyEmailView({ email, selection }: { email: string; selection
           onClick={onResend}
         >
           {resend === "sending"
-            ? "Sending…"
+            ? t("verify.sending")
             : cooldown > 0
-              ? `Resend email in ${cooldown}s`
-              : "Resend email"}
+              ? t("verify.resendIn", { seconds: cooldown })
+              : t("verify.resend")}
         </Button>
         <p role="status" className="min-h-5 text-sm text-text-secondary">
-          {resend === "sent" && "Verification email sent again."}
+          {resend === "sent" && t("verify.sent")}
         </p>
         {resend === "error" && (
           <p role="alert" className="text-sm text-danger">
-            We couldn&apos;t resend the email. Please try again.
+            {t("verify.resendError")}
           </p>
         )}
       </div>
 
       <Link
         href={`/create-account?${planQuery(selection)}`}
-        className="text-sm font-medium text-primary hover:underline"
+        className="text-sm font-semibold text-primary hover:underline"
       >
-        Use a different email
+        {t("verify.different")}
       </Link>
 
       {process.env.NODE_ENV !== "production" && (

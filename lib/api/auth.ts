@@ -1,5 +1,5 @@
 import { simulateLatency } from "@/lib/mocks/latency";
-import { userForEmail } from "@/lib/mocks/auth";
+import { rememberAccount, userForEmail } from "@/lib/mocks/auth";
 import type { CreateAccountInput, SessionUser } from "@/types";
 
 export class EmailTakenError extends Error {}
@@ -12,6 +12,7 @@ export async function createAccount(input: CreateAccountInput): Promise<void> {
     throw new EmailTakenError("An account with this email already exists.");
   }
   await simulateLatency(undefined);
+  rememberAccount({ fullName: input.fullName, email: input.email });
 }
 
 // TODO(backend): wire to real endpoint
@@ -48,7 +49,9 @@ export async function signIn(input: { email: string; password: string }): Promis
 // Google and returns to the app signed in; the mock just resolves with a user.
 export async function signInWithGoogle(): Promise<SessionUser> {
   await simulateLatency(undefined, 900);
-  return userForEmail("google.user@example.com");
+  const user = userForEmail("google.user@example.com");
+  rememberAccount({ fullName: user.name, email: user.email });
+  return user;
 }
 
 // TODO(backend): wire to real endpoint. Always resolves, so the screen can't be used to find out

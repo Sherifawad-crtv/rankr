@@ -1,6 +1,6 @@
-import Link from "next/link";
+import { PageFallback } from "@/components/ui";
 import { Suspense } from "react";
-import { Card } from "@/components/ui";
+import { NoPlanNotice } from "@/components/entry/no-plan-notice";
 import { CheckoutView } from "@/components/entry/checkout-view";
 import { parsePlanSelection } from "@/lib/entry-flow";
 
@@ -10,14 +10,7 @@ async function CheckoutContent({ searchParams }: { searchParams: SearchParams })
   const selection = parsePlanSelection(await searchParams);
 
   if (!selection) {
-    return (
-      <Card className="mx-auto flex max-w-md flex-col items-center gap-4 text-center">
-        <p className="text-base text-text-primary">Choose a plan to check out.</p>
-        <Link href="/plans" className="text-base font-medium text-primary hover:underline">
-          View plans
-        </Link>
-      </Card>
-    );
+    return <NoPlanNotice messageKey="plans.noPlanCheckout" />;
   }
 
   return <CheckoutView selection={selection} />;
@@ -25,7 +18,7 @@ async function CheckoutContent({ searchParams }: { searchParams: SearchParams })
 
 export default function CheckoutPage({ searchParams }: { searchParams: SearchParams }) {
   return (
-    <Suspense fallback={<p role="status" className="text-center text-text-secondary">Loading…</p>}>
+    <Suspense fallback={<PageFallback />}>
       <CheckoutContent searchParams={searchParams} />
     </Suspense>
   );
