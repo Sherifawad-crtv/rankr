@@ -34,6 +34,7 @@ import {
   type ScoreWeights,
 } from "@/types";
 import { CandidateCell } from "./candidate-cell";
+import { ExportDialog } from "./export-dialog";
 import { RankedToolbar, type StageFilter } from "./ranked-toolbar";
 import { WeightPanel } from "./weight-panel";
 
@@ -62,6 +63,7 @@ export function RankedView({ jobId }: { jobId: string }) {
   const [overrides, setOverrides] = useState<Record<string, CandidateStage>>({});
   const [acting, setActing] = useState(false);
   const [confirmReject, setConfirmReject] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const jobWeights = state.status === "ready" ? (state.data[0]?.weights ?? DEFAULT_SCORE_WEIGHTS) : DEFAULT_SCORE_WEIGHTS;
   const weights = customWeights ?? jobWeights;
@@ -209,9 +211,14 @@ export function RankedView({ jobId }: { jobId: string }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageHeader title={job.title} description={tn("ranked.subtitle", candidates.length)} />
-        <Link href={`/jobs/${jobId}/upload`} className={buttonClass("primary", "md")}>
-          <Icon name="upload" size={18} /> {t("ranked.upload")}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" disabled={candidates.length === 0} onClick={() => setExportOpen(true)}>
+            <Icon name="download" size={18} /> {t("export.button")}
+          </Button>
+          <Link href={`/jobs/${jobId}/upload`} className={buttonClass("primary", "md")}>
+            <Icon name="upload" size={18} /> {t("ranked.upload")}
+          </Link>
+        </div>
       </div>
 
       {candidates.length === 0 ? (
@@ -325,6 +332,15 @@ export function RankedView({ jobId }: { jobId: string }) {
           </section>
         </>
       )}
+
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        jobTitle={job.title}
+        ranked={ranked}
+        filteredOut={filteredOut}
+        weights={weights}
+      />
 
       <ConfirmDialog
         open={confirmReject}
