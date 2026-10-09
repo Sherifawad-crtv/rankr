@@ -16,6 +16,7 @@ import { buttonClass } from "@/components/ui/button";
 import { cn, stagger } from "@/components/ui/cn";
 import { getProcessingStatus } from "@/lib/api";
 import { track } from "@/lib/analytics";
+import { useLocale } from "@/lib/i18n/locale-context";
 import {
   PIPELINE_STAGES,
   activeStageIndex,
@@ -35,6 +36,7 @@ type View =
   | { status: "ready"; batch: ProcessingBatch | null };
 
 export function ProcessingView({ jobId }: { jobId: string }) {
+  const { tn } = useLocale();
   const [view, setView] = useState<View>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
@@ -94,7 +96,8 @@ export function ProcessingView({ jobId }: { jobId: string }) {
   const total = files.length;
   const settled = files.filter((file) => file.status === "done" || file.status === "failed").length;
   const failedCount = files.filter((file) => file.status === "failed").length;
-  const scoredCount = settled - failedCount;
+  const duplicateCount = files.filter((file) => file.isDuplicate).length;
+  const scoredCount = settled - failedCount - duplicateCount;
   const finished = isFinished(files);
 
   const progress = stageProgress(files);
@@ -122,6 +125,9 @@ export function ProcessingView({ jobId }: { jobId: string }) {
                 <p>
                   <Badge tone="danger">{failedCount} couldn&apos;t be read</Badge>
                 </p>
+              )}
+              {duplicateCount > 0 && (
+                <p className="text-sm text-text-secondary">{tn("processing.duplicates", duplicateCount)}</p>
               )}
             </div>
             <div className="flex flex-wrap justify-center gap-2">

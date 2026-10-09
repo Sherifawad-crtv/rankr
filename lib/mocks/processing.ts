@@ -15,6 +15,8 @@ interface StoredBatch {
   runId: string;
   startedAt: number;
   files: Array<{ id: string; fileName: string }>;
+  /** Files identical to a CV already processed (or earlier in this batch); their result is reused. */
+  duplicateIds: Set<string>;
   finalized: boolean;
 }
 
@@ -28,6 +30,15 @@ function hash(text: string): number {
   let value = 0;
   for (const char of text) value = (value * 31 + char.charCodeAt(0)) >>> 0;
   return value;
+}
+
+/** Same person's CV in another file type or spelling resolves to the same key. */
+function dedupeKey(text: string): string {
+  return text
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 }
 
 function failed(fileName: string): boolean {
@@ -98,13 +109,19 @@ function candidateFromFile(job: Job | undefined, runId: string, id: string, file
 export function createBatch(jobId: string, fileNames: string[]): void {
   const stamp = Date.now();
   const runId = `run-${stamp}`;
-  batches.set(jobId, {
-    jobId,
-    runId,
-    startedAt: stamp,
-    files: fileNames.map((fileName, index) => ({ id: `cv-${stamp}-${index}`, fileName })),
-    finalized: false,
-  });
+  const files = fileNames.map((fileName, index) => ({ id: `cv-${stamp}-${index}`, fileName }));
+
+  const known = new Set(
+    mockCandidates.filter((candidate) => candidate.jobId === jobId).map((c) => dedupeKey(c.cv.fullName)),
+  );
+  const duplicateIds = new Set<string>();
+  for (const file of files) {
+    const key = dedupeKey(file.fileName);
+    if (known.has(key)) duplicateIds.add(file.id);
+    else known.add(key);
+  }
+
+  batches.set(jobId, { jobId, runId, startedAt: stamp, files, duplicateIds, finalized: false });
   mockRuns.unshift({
     id: runId,
     jobId,
@@ -129,6 +146,10 @@ export function readBatch(jobId: string): ProcessingBatch | null {
 
   const files: UploadedCV[] = batch.files.map((file, index) => {
     const t = elapsed - index * stagger;
+    // A matching hash is detected straight away, so duplicates never wait for the pipeline.
+    if (batch.duplicateIds.has(file.id)) {
+      return { id: file.id, jobId, fileName: file.fileName, isDuplicate: true, status: "done", step: null, error: null };
+    }
     const base = { id: file.id, jobId, fileName: file.fileName, isDuplicate: false };
     if (t < 0) return { ...base, status: "pending", step: null, error: null };
     // Unreadable files fail at the "reading" step.
@@ -143,7 +164,7 @@ export function readBatch(jobId: string): ProcessingBatch | null {
   if (finished && !batch.finalized) {
     batch.finalized = true;
     const job = mockJobs.find((item) => item.id === jobId);
-    const added = files.filter((file) => file.status === "done");
+    const added = files.filter((file) => file.status === "done" && !file.isDuplicate);
     mockCandidates.push(...added.map((file) => candidateFromFile(job, batch.runId, file.id, file.fileName)));
     if (job) job.candidateCount += added.length;
     for (const plan of Object.values(mockPlans)) plan.cvUsed += added.length;
@@ -151,7 +172,8 @@ export function readBatch(jobId: string): ProcessingBatch | null {
     if (run) {
       run.status = "completed";
       run.scored = added.length;
-      run.failed = files.length - added.length;
+      run.duplicates = batch.duplicateIds.size;
+      run.failed = files.filter((file) => file.status === "failed").length;
     }
   }
 

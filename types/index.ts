@@ -188,6 +188,21 @@ export interface UploadedCV {
   error: string | null;
 }
 
+/** Where an upload is while the files travel to Rankr. */
+export interface UploadProgress {
+  phase: "uploading" | "scanning";
+  done: number;
+  total: number;
+}
+
+/** Hourly upload allowance per user. TODO(spec): confirm an "upload" means one batch, not one file. */
+export interface UploadQuota {
+  limit: number;
+  used: number;
+  /** Minutes until the allowance resets. */
+  resetsInMinutes: number;
+}
+
 /** One batch of CVs uploaded together for a job (up to 500). */
 export interface ScreeningRun {
   id: string;

@@ -10,7 +10,15 @@ import {
   type ReactNode,
 } from "react";
 import type { Locale, LocalizedText } from "@/types";
-import { directionOf, localize, translate, type MessageKey, type Params } from "./index";
+import {
+  directionOf,
+  localize,
+  translate,
+  translatePlural,
+  type MessageKey,
+  type Params,
+  type PluralKey,
+} from "./index";
 
 const STORAGE_KEY = "rankr-locale";
 const listeners = new Set<() => void>();
@@ -46,6 +54,8 @@ interface LocaleValue {
   dir: "ltr" | "rtl";
   setLocale: (locale: Locale) => void;
   t: (key: MessageKey, params?: Params) => string;
+  /** Plural-aware message, e.g. tn("upload.ready", 3). */
+  tn: (base: PluralKey, count: number, params?: Params) => string;
   /** Picks the right language from bilingual content such as skill names. */
   l: (text: LocalizedText) => string;
 }
@@ -66,9 +76,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, [locale, dir]);
 
   const t = useCallback((key: MessageKey, params?: Params) => translate(locale, key, params), [locale]);
+  const tn = useCallback(
+    (base: PluralKey, count: number, params?: Params) => translatePlural(locale, base, count, params),
+    [locale],
+  );
   const l = useCallback((text: LocalizedText) => localize(text, locale), [locale]);
 
-  const value = useMemo(() => ({ locale, dir, setLocale: storeLocale, t, l }), [locale, dir, t, l]);
+  const value = useMemo(
+    () => ({ locale, dir, setLocale: storeLocale, t, tn, l }),
+    [locale, dir, t, tn, l],
+  );
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 

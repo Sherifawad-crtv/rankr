@@ -3,14 +3,16 @@
 import { useRef, useState, type DragEvent } from "react";
 import { Button, Icon } from "@/components/ui";
 import { cn } from "@/components/ui/cn";
+import { MAX_CVS_PER_RUN } from "@/lib/limits";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 interface DropzoneProps {
   accept: string;
-  hint: string;
   onFiles: (files: File[]) => void;
 }
 
-export function Dropzone({ accept, hint, onFiles }: DropzoneProps) {
+export function Dropzone({ accept, onFiles }: DropzoneProps) {
+  const { t } = useLocale();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -44,11 +46,11 @@ export function Dropzone({ accept, hint, onFiles }: DropzoneProps) {
         <Icon name="upload" variant="bold" size={28} />
       </span>
       <p className="font-display text-lg font-semibold text-text-primary">
-        {dragging ? "Drop to add them" : "Drag and drop CVs here"}
+        {dragging ? t("upload.drop.titleActive") : t("upload.drop.title")}
       </p>
-      <p className="text-sm text-text-secondary">{hint}</p>
+      <p className="text-sm text-text-secondary">{t("upload.drop.hint", { max: MAX_CVS_PER_RUN })}</p>
       <Button variant="secondary" onClick={() => inputRef.current?.click()}>
-        Choose files
+        {t("upload.drop.choose")}
       </Button>
       <input
         ref={inputRef}
@@ -56,7 +58,7 @@ export function Dropzone({ accept, hint, onFiles }: DropzoneProps) {
         multiple
         accept={accept}
         className="sr-only"
-        aria-label="Choose CV files"
+        aria-label={t("upload.drop.aria")}
         tabIndex={-1}
         onChange={(event) => {
           onFiles(Array.from(event.target.files ?? []));

@@ -5,6 +5,9 @@ import { en, type MessageKey } from "./messages/en";
 export type { MessageKey };
 export type Params = Record<string, string | number>;
 
+/** Keys that have plural forms: "x.one", "x.other" (and Arabic "x.few" etc.) exist, and you pass "x". */
+export type PluralKey = MessageKey extends infer K ? (K extends `${infer Base}.other` ? Base : never) : never;
+
 export const LOCALES: Locale[] = ["en", "ar"];
 const RTL_LOCALES: Locale[] = ["ar"];
 
@@ -19,6 +22,17 @@ export function translate(locale: Locale, key: MessageKey, params?: Params): str
   return template.replace(/\{(\w+)\}/g, (match, name: string) =>
     name in params ? String(params[name]) : match,
   );
+}
+
+/**
+ * Chooses the plural form for `count` using the locale's rules (English one/other; Arabic has more),
+ * falling back to ".other". {count} is filled in automatically.
+ */
+export function translatePlural(locale: Locale, base: PluralKey, count: number, params?: Params): string {
+  const category = new Intl.PluralRules(locale).select(count);
+  const messages: Partial<Record<string, string>> = locale === "ar" ? { ...en, ...ar } : en;
+  const key = (messages[`${base}.${category}`] ? `${base}.${category}` : `${base}.other`) as MessageKey;
+  return translate(locale, key, { count, ...params });
 }
 
 /** Picks the right language from text that exists in both, falling back to English. */
