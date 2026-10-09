@@ -259,7 +259,7 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 | Stages | Invented stages that include interview/offer (out of scope) |
 | Entry flow | Hidden; sign-in, Google and forgot-password not built; pricing conflicts |
 | i18n / RTL | Not started |
-| Settings, admin, messaging, analytics | Not started |
+| Admin, messaging, analytics | Not started |
 
 ---
 
@@ -293,7 +293,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 **Phase 3, accounts:** *L*
 - [x] Sign-in (email and Google), forgot password, reset password, sign-out, persistent mock session, optional route guard.
 - [x] Entry funnel re-aligned: translated, progress bar, Google sign-up, Invite team (Enterprise only), Welcome, signs you in on workspace creation.
-- [ ] Settings: profile, company, notifications, team and roles.
+- [x] Settings: profile (name, job title, language, change password), company and white-label brand (colour, logo, live preview), team and roles (invite, change role, remove, last-admin guard; Enterprise only), notifications. Admin-only edits; recruiters see company and team read-only.
 - [ ] Delete-my-data flow.
 - [ ] Billing.
 

@@ -347,3 +347,31 @@ export interface MemberInvite {
   email: string;
   role: InviteRole;
 }
+
+export interface UserProfile {
+  fullName: string;
+  jobTitle: string;
+  email: string;
+}
+
+export interface CompanySettings {
+  name: string;
+  size: CompanySize;
+  /** How the company looks on its candidate-facing pages. */
+  branding: OrgBranding;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: InviteRole;
+  /** "invited" means the person has not accepted yet. */
+  status: "active" | "invited";
+}
+
+/** Which emails a person gets. TODO(spec): the full list of notifications. */
+export interface NotificationPreferences {
+  runCompleted: boolean;
+  productTips: boolean;
+}

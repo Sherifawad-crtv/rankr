@@ -5,15 +5,10 @@ import { useState, type FormEvent } from "react";
 import { Badge, Button, Card, Icon, Input, Select } from "@/components/ui";
 import { stagger } from "@/components/ui/cn";
 import { inviteMembers } from "@/lib/api";
-import { isValidEmail } from "@/lib/auth";
 import { planQuery } from "@/lib/entry-flow";
+import { parseInvites } from "@/lib/invites";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { INVITE_ROLES, type InviteRole, type MemberInvite, type PlanSelection } from "@/types";
-
-/** Pulls email addresses out of pasted text (commas, spaces, semicolons or new lines). */
-function splitEmails(text: string): string[] {
-  return text.split(/[\s,;]+/).filter(Boolean);
-}
 
 export function InviteTeamView({ selection }: { selection: PlanSelection }) {
   const router = useRouter();
@@ -27,26 +22,14 @@ export function InviteTeamView({ selection }: { selection: PlanSelection }) {
 
   function onAdd(event: FormEvent) {
     event.preventDefault();
-    const known = new Set(invites.map((invite) => invite.email.toLowerCase()));
-    const added: MemberInvite[] = [];
-    const leftover: string[] = [];
-    let problem: string | null = null;
-
-    for (const email of splitEmails(text)) {
-      if (!isValidEmail(email)) {
-        problem ??= t("invite.error.invalid", { email });
-        leftover.push(email);
-      } else if (known.has(email.toLowerCase())) {
-        problem ??= t("invite.error.duplicate", { email });
-      } else {
-        known.add(email.toLowerCase());
-        added.push({ email, role });
-      }
-    }
-
+    const { added, leftover, problem } = parseInvites(
+      text,
+      role,
+      invites.map((invite) => invite.email),
+    );
     setInvites((current) => [...current, ...added]);
     setText(leftover.join(", "));
-    setError(problem);
+    setError(problem ? t(`invite.error.${problem.kind}`, { email: problem.email }) : null);
   }
 
   async function onSend() {

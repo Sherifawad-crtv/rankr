@@ -1,5 +1,6 @@
 import { currentAccount } from "@/lib/mocks/auth";
 import { simulateLatency } from "@/lib/mocks/latency";
+import { mockSettings } from "@/lib/mocks/settings";
 import type { AccountProfile, MemberInvite, SessionUser, Workspace, WorkspaceInput } from "@/types";
 
 let createdWorkspace: Workspace | null = null;
@@ -30,6 +31,14 @@ export async function getWorkspace(): Promise<Workspace | null> {
 
 // TODO(backend): wire to real endpoint. Emails each person an invitation (Enterprise only).
 export async function inviteMembers(invites: MemberInvite[]): Promise<void> {
-  void invites;
   await simulateLatency(undefined, 800);
+  for (const invite of invites) {
+    mockSettings.team.push({
+      id: `invite-${invite.email}`,
+      name: invite.email,
+      email: invite.email,
+      role: invite.role,
+      status: "invited",
+    });
+  }
 }

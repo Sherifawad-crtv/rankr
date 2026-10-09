@@ -11,6 +11,8 @@ interface SessionValue {
   /** Called after a successful sign-in with the account the back-end returned. */
   signIn: (user: SessionUser) => void;
   signOut: () => void;
+  /** Keeps the name shown in the header in step with the profile. */
+  updateUser: (changes: Partial<Pick<SessionUser, "name">>) => void;
   /** Dev switchers: act as another role or plan. */
   setRole: (role: UserRole) => void;
   setPlanMode: (mode: PlanMode) => void;
@@ -24,6 +26,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback((user: SessionUser) => writeSession({ signedIn: true, user }), []);
   const signOut = useCallback(() => writeSession({ signedIn: false, user: readSession().user }), []);
+  const updateUser = useCallback((changes: Partial<Pick<SessionUser, "name">>) => {
+    const current = readSession();
+    writeSession({ signedIn: current.signedIn, user: { ...current.user, ...changes } });
+  }, []);
   const setRole = useCallback(
     (role: UserRole) => {
       const current = readSession();
@@ -40,8 +46,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<SessionValue>(
-    () => ({ user: stored.user, signedIn: stored.signedIn, signIn, signOut, setRole, setPlanMode }),
-    [stored, signIn, signOut, setRole, setPlanMode],
+    () => ({ user: stored.user, signedIn: stored.signedIn, signIn, signOut, updateUser, setRole, setPlanMode }),
+    [stored, signIn, signOut, updateUser, setRole, setPlanMode],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

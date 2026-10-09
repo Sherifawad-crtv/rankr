@@ -10,3 +10,4 @@ export * from "./uploads";
 export * from "./dashboard";
 export * from "./skills";
 export * from "./runs";
+export * from "./settings";
