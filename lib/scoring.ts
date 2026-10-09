@@ -1,12 +1,5 @@
 import { SCORE_DIMENSIONS, type Candidate, type ScoreDimension, type ScoreWeights } from "@/types";
 
-export const DIMENSION_LABELS: Record<ScoreDimension, string> = {
-  skills: "Skills",
-  experience: "Experience",
-  education: "Education",
-  profileQuality: "Profile quality",
-};
-
 export function weightsTotal(weights: ScoreWeights): number {
   return SCORE_DIMENSIONS.reduce((sum, dimension) => sum + weights[dimension], 0);
 }

@@ -1,8 +1,16 @@
 import { cn } from "@/components/ui/cn";
 
-export function StepProgress({ steps, current }: { steps: string[]; current: number }) {
+export function StepProgress({
+  steps,
+  current,
+  label = "Progress",
+}: {
+  steps: string[];
+  current: number;
+  label?: string;
+}) {
   return (
-    <ol className="flex items-center gap-2" aria-label="Progress">
+    <ol className="flex items-center gap-2" aria-label={label}>
       {steps.map((label, index) => {
         const done = index < current;
         const active = index === current;

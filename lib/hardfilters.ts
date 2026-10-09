@@ -1,29 +1,24 @@
-import type { DegreeLevel, HardFilter } from "@/types";
+import { localize, translate } from "@/lib/i18n";
+import type { DegreeLevel, HardFilter, Locale } from "@/types";
 
-const DEGREE_LABELS: Record<DegreeLevel, string> = {
-  none: "No degree required",
-  diploma: "Diploma",
-  bachelor: "Bachelor's degree",
-  master: "Master's degree",
-  doctorate: "Doctorate",
-};
-
-export function degreeLabel(level: DegreeLevel): string {
-  return DEGREE_LABELS[level];
+export function degreeLabel(level: DegreeLevel, locale: Locale = "en"): string {
+  return translate(locale, `degree.${level}`);
 }
 
-/** Plain-language description of a knock-out rule, shown to recruiters. TODO(i18n): translate. */
-export function describeHardFilter(filter: HardFilter): string {
+/** Plain-language description of a knock-out rule, shown to recruiters. */
+export function describeHardFilter(filter: HardFilter, locale: Locale = "en"): string {
   switch (filter.kind) {
     case "requiredSkills":
-      return `Must have: ${filter.skills.map((skill) => skill.name.en).join(", ")}`;
+      return translate(locale, "filter.requiredSkills", {
+        skills: filter.skills.map((skill) => localize(skill.name, locale)).join(", "),
+      });
     case "minExperienceYears":
-      return `Minimum ${filter.years} years of experience`;
+      return translate(locale, "filter.minExperienceYears", { years: filter.years });
     case "minDegree":
-      return `Minimum ${degreeLabel(filter.level).toLowerCase()}`;
+      return translate(locale, "filter.minDegree", { degree: degreeLabel(filter.level, locale) });
     case "location":
-      return `Located in ${filter.value}`;
+      return translate(locale, "filter.location", { value: filter.value });
     case "workAuthorization":
-      return "Authorised to work in the job's country";
+      return translate(locale, "filter.workAuthorization");
   }
 }

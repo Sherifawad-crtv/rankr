@@ -25,3 +25,5 @@ export { Disclaimer } from "./disclaimer";
 export { MatchScore } from "./match-score";
 export { SkillChip, type SkillState } from "./skill-chip";
 export { StatusPill } from "./status-pill";
+export { Switch } from "./switch";
+export { NumberStepper } from "./number-stepper";

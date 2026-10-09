@@ -2,7 +2,8 @@
 
 import { useId } from "react";
 import { Button, Card } from "@/components/ui";
-import { DIMENSION_LABELS, weightsTotal } from "@/lib/scoring";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { weightsTotal } from "@/lib/scoring";
 import { SCORE_DIMENSIONS, type ScoreDimension, type ScoreWeights } from "@/types";
 
 interface WeightPanelProps {
@@ -13,17 +14,18 @@ interface WeightPanelProps {
 
 export function WeightPanel({ weights, onChange, onReset }: WeightPanelProps) {
   const base = useId();
+  const { t } = useLocale();
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">Scoring weights</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{t("weights.title")}</h2>
           <p className="text-sm text-text-secondary">
-            Adjust what matters most. The list re-ranks instantly and always totals {weightsTotal(weights)}%.
+            {t("weights.hint", { total: weightsTotal(weights) })}
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={onReset}>
-          Reset
+          {t("common.reset")}
         </Button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -32,7 +34,7 @@ export function WeightPanel({ weights, onChange, onReset }: WeightPanelProps) {
           return (
             <div key={dimension} className="flex flex-col gap-1">
               <label htmlFor={id} className="flex justify-between text-sm font-medium text-text-primary">
-                {DIMENSION_LABELS[dimension]}
+                {t(`dimension.${dimension}`)}
                 <span className="text-text-secondary">{weights[dimension]}%</span>
               </label>
               <input

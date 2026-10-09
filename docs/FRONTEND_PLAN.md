@@ -282,7 +282,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 - Still to do as screens are rebuilt: move the remaining hardcoded English strings into `t()` keys.
 
 **Phase 2, the hero loop (P0):** *this is the product*
-1. Job creation wizard with skill picker (L)
+1. ~~Job creation wizard with skill picker (L)~~ **done** (create and edit, at `/jobs/new` and `/jobs/[id]/edit`)
 2. Upload fixes: cap, rate limit, duplicates, progress (M)
 3. Processing fixes: retry, OCR and confidence flags (M)
 4. Ranked list v2: match %, chips, rationale, filters, bulk actions (L)
