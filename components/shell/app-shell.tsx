@@ -3,21 +3,12 @@
 import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Badge, Button, Icon } from "@/components/ui";
 import { useSession } from "@/lib/session";
+import { Logo } from "@/components/brand/logo";
 import { DevSwitcher } from "./dev-switcher";
 import { NavLinks } from "./nav-links";
 
 function Brand() {
-  return (
-    <span className="flex items-center gap-2 font-display text-lg font-bold text-text-primary">
-      <span
-        aria-hidden
-        className="flex size-7 items-center justify-center rounded-lg bg-primary text-text-inverse"
-      >
-        <Icon name="ranking" variant="bold" size={16} />
-      </span>
-      Rankr
-    </span>
-  );
+  return <Logo height={26} />;
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
