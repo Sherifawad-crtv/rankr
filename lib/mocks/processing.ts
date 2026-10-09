@@ -10,14 +10,24 @@ import { describeHardFilter } from "@/lib/hardfilters";
 import { mockCandidates, mockJobs, mockPlans, mockRuns } from "./data";
 import { mockSkills, skillRef } from "./skills";
 
+interface StoredFile {
+  id: string;
+  fileName: string;
+  /** Set when the file was retried; its timeline restarts from this moment. */
+  restartedAt: number | null;
+  /** How many times it was retried. Only a first attempt can fail in the mock. */
+  retries: number;
+  /** Its candidate has been added to the results. */
+  counted: boolean;
+}
+
 interface StoredBatch {
   jobId: string;
   runId: string;
   startedAt: number;
-  files: Array<{ id: string; fileName: string }>;
+  files: StoredFile[];
   /** Files identical to a CV already processed (or earlier in this batch); their result is reused. */
   duplicateIds: Set<string>;
-  finalized: boolean;
 }
 
 const batches = new Map<string, StoredBatch>();
@@ -25,6 +35,9 @@ const batches = new Map<string, StoredBatch>();
 const FILE_DURATION_MS = 5200;
 const MAX_STAGGER_MS = 140;
 const MAX_TOTAL_STAGGER_MS = 2400;
+const STEP_MS = FILE_DURATION_MS / PROCESSING_STEPS.length;
+/** Unreadable files fail at the end of the "reading" step. */
+const FAIL_AT_MS = STEP_MS * 2;
 
 function hash(text: string): number {
   let value = 0;
@@ -106,10 +119,24 @@ function candidateFromFile(job: Job | undefined, runId: string, id: string, file
   };
 }
 
+function ocrUsed(fileName: string): boolean {
+  return hash(fileName) % 4 === 0;
+}
+
+function lowConfidence(fileName: string): boolean {
+  return hash(fileName) % 5 === 0;
+}
+
 export function createBatch(jobId: string, fileNames: string[]): void {
   const stamp = Date.now();
   const runId = `run-${stamp}`;
-  const files = fileNames.map((fileName, index) => ({ id: `cv-${stamp}-${index}`, fileName }));
+  const files: StoredFile[] = fileNames.map((fileName, index) => ({
+    id: `cv-${stamp}-${index}`,
+    fileName,
+    restartedAt: null,
+    retries: 0,
+    counted: false,
+  }));
 
   const known = new Set(
     mockCandidates.filter((candidate) => candidate.jobId === jobId).map((c) => dedupeKey(c.cv.fullName)),
@@ -121,7 +148,7 @@ export function createBatch(jobId: string, fileNames: string[]): void {
     else known.add(key);
   }
 
-  batches.set(jobId, { jobId, runId, startedAt: stamp, files, duplicateIds, finalized: false });
+  batches.set(jobId, { jobId, runId, startedAt: stamp, files, duplicateIds });
   mockRuns.unshift({
     id: runId,
     jobId,
@@ -131,51 +158,92 @@ export function createBatch(jobId: string, fileNames: string[]): void {
     total: fileNames.length,
     scored: 0,
     failed: 0,
-    duplicates: 0,
+    duplicates: duplicateIds.size,
   });
 }
 
-/** Derives each file's status from elapsed time; adds candidates once the whole batch is done. */
+function startOf(batch: StoredBatch, file: StoredFile, index: number, stagger: number): number {
+  return file.restartedAt ?? batch.startedAt + index * stagger;
+}
+
+function snapshot(batch: StoredBatch, now: number): UploadedCV[] {
+  const stagger = Math.min(MAX_STAGGER_MS, MAX_TOTAL_STAGGER_MS / batch.files.length);
+  return batch.files.map((file, index) => {
+    const t = now - startOf(batch, file, index, stagger);
+    const base = { id: file.id, jobId: batch.jobId, fileName: file.fileName };
+    const flagsKnown = batch.duplicateIds.has(file.id) ? false : t >= STEP_MS;
+
+    // A matching hash is detected straight away, so duplicates never wait for the pipeline.
+    if (batch.duplicateIds.has(file.id)) {
+      return { ...base, isDuplicate: true, status: "done", step: null, error: null, ocrUsed: false, lowConfidence: false };
+    }
+    const flags = { isDuplicate: false, ocrUsed: flagsKnown && ocrUsed(file.fileName), lowConfidence: flagsKnown && lowConfidence(file.fileName) };
+    if (t < 0) return { ...base, ...flags, status: "pending", step: null, error: null };
+    if (failed(file.fileName) && file.retries === 0 && t >= FAIL_AT_MS) {
+      return { ...base, ...flags, status: "failed", step: null, error: "We couldn't extract any text from this file." };
+    }
+    if (t >= FILE_DURATION_MS) return { ...base, ...flags, status: "done", step: null, error: null };
+    return { ...base, ...flags, status: "processing", step: PROCESSING_STEPS[Math.floor(t / STEP_MS)], error: null };
+  });
+}
+
+function isSettled(file: UploadedCV): boolean {
+  return file.status === "done" || file.status === "failed";
+}
+
+/** Derives each file's status from elapsed time; adds candidates as files finish scoring. */
 export function readBatch(jobId: string): ProcessingBatch | null {
   const batch = batches.get(jobId);
   if (!batch) return null;
 
-  const stagger = Math.min(MAX_STAGGER_MS, MAX_TOTAL_STAGGER_MS / batch.files.length);
-  const elapsed = Date.now() - batch.startedAt;
-  const stepMs = FILE_DURATION_MS / PROCESSING_STEPS.length;
+  const now = Date.now();
+  const files = snapshot(batch, now);
+  const job = mockJobs.find((item) => item.id === jobId);
+  const run = mockRuns.find((item) => item.id === batch.runId);
 
-  const files: UploadedCV[] = batch.files.map((file, index) => {
-    const t = elapsed - index * stagger;
-    // A matching hash is detected straight away, so duplicates never wait for the pipeline.
-    if (batch.duplicateIds.has(file.id)) {
-      return { id: file.id, jobId, fileName: file.fileName, isDuplicate: true, status: "done", step: null, error: null };
-    }
-    const base = { id: file.id, jobId, fileName: file.fileName, isDuplicate: false };
-    if (t < 0) return { ...base, status: "pending", step: null, error: null };
-    // Unreadable files fail at the "reading" step.
-    if (failed(file.fileName) && t >= stepMs * 2) {
-      return { ...base, status: "failed", step: null, error: "We couldn't extract any text from this file." };
-    }
-    if (t >= FILE_DURATION_MS) return { ...base, status: "done", step: null, error: null };
-    return { ...base, status: "processing", step: PROCESSING_STEPS[Math.floor(t / stepMs)], error: null };
+  files.forEach((file, index) => {
+    const stored = batch.files[index];
+    if (file.status !== "done" || file.isDuplicate || stored.counted) return;
+    stored.counted = true;
+    mockCandidates.push(candidateFromFile(job, batch.runId, file.id, file.fileName));
+    if (job) job.candidateCount += 1;
+    for (const plan of Object.values(mockPlans)) plan.cvUsed += 1;
+    if (run) run.scored += 1;
   });
 
-  const finished = files.every((file) => file.status === "done" || file.status === "failed");
-  if (finished && !batch.finalized) {
-    batch.finalized = true;
-    const job = mockJobs.find((item) => item.id === jobId);
-    const added = files.filter((file) => file.status === "done" && !file.isDuplicate);
-    mockCandidates.push(...added.map((file) => candidateFromFile(job, batch.runId, file.id, file.fileName)));
-    if (job) job.candidateCount += added.length;
-    for (const plan of Object.values(mockPlans)) plan.cvUsed += added.length;
-    const run = mockRuns.find((item) => item.id === batch.runId);
-    if (run) {
-      run.status = "completed";
-      run.scored = added.length;
-      run.duplicates = batch.duplicateIds.size;
-      run.failed = files.filter((file) => file.status === "failed").length;
-    }
+  const finished = files.every(isSettled);
+  if (run) {
+    run.failed = files.filter((file) => file.status === "failed").length;
+    run.status = finished ? "completed" : "processing";
   }
 
-  return { jobId, runId: batch.runId, files };
+  // Time left until the slowest unsettled file finishes.
+  const stagger = Math.min(MAX_STAGGER_MS, MAX_TOTAL_STAGGER_MS / batch.files.length);
+  const endTimes = files
+    .map((file, index) => ({ file, start: startOf(batch, batch.files[index], index, stagger) }))
+    .filter(({ file }) => !isSettled(file))
+    .map(({ file, start }) =>
+      failed(file.fileName) && batch.files.find((item) => item.id === file.id)?.retries === 0
+        ? start + FAIL_AT_MS
+        : start + FILE_DURATION_MS,
+    );
+  const etaSeconds = finished ? null : Math.max(1, Math.ceil((Math.max(...endTimes) - now) / 1000));
+
+  return { jobId, runId: batch.runId, files, etaSeconds };
+}
+
+/** Sends failed files back through the pipeline. Without `fileIds`, every failed file is retried. */
+export function retryFiles(jobId: string, fileIds?: string[]): void {
+  const batch = batches.get(jobId);
+  if (!batch) return;
+  const now = Date.now();
+  const current = snapshot(batch, now);
+  let offset = 0;
+  current.forEach((file, index) => {
+    if (file.status !== "failed") return;
+    if (fileIds && !fileIds.includes(file.id)) return;
+    batch.files[index].retries += 1;
+    batch.files[index].restartedAt = now + offset * 100;
+    offset += 1;
+  });
 }

@@ -1,4 +1,4 @@
-import { createBatch, readBatch } from "@/lib/mocks/processing";
+import { createBatch, readBatch, retryFiles } from "@/lib/mocks/processing";
 import { simulateLatency } from "@/lib/mocks/latency";
 import { consumeQuota, readQuota, simulateUpload } from "@/lib/mocks/uploads";
 import type { ProcessingBatch, UploadProgress, UploadQuota } from "@/types";
@@ -35,4 +35,10 @@ export async function submitCVBatch(
 // TODO(backend): wire to real endpoint. Polled while processing; null if no batch exists.
 export async function getProcessingStatus(jobId: string): Promise<ProcessingBatch | null> {
   return simulateLatency(readBatch(jobId), 200);
+}
+
+// TODO(backend): wire to real endpoint. Re-queues failed files; with no ids, every failed file in the run.
+export async function retryFailedFiles(jobId: string, fileIds?: string[]): Promise<void> {
+  await simulateLatency(undefined, 300);
+  retryFiles(jobId, fileIds);
 }

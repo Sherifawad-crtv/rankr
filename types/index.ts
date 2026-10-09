@@ -186,6 +186,10 @@ export interface UploadedCV {
   isDuplicate: boolean;
   /** Plain-language reason, set when status is "failed". */
   error: string | null;
+  /** Scanned PDF read with OCR. Known once the file has been read. */
+  ocrUsed: boolean;
+  /** Parsed with low confidence. Known once the file has been read. */
+  lowConfidence: boolean;
 }
 
 /** Where an upload is while the files travel to Rankr. */
@@ -221,6 +225,8 @@ export interface ProcessingBatch {
   jobId: string;
   runId: string;
   files: UploadedCV[];
+  /** Seconds until every file is settled, or null when there is no estimate or the run is finished. */
+  etaSeconds: number | null;
 }
 
 /** Candidate-facing view: stage only, never scores or rankings. TODO(spec): candidate-facing stage labels. */

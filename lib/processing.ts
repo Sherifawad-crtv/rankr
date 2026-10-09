@@ -1,69 +1,21 @@
 import type { IconName } from "@/components/ui";
+import type { MessageKey } from "@/lib/i18n";
 import { PROCESSING_STEPS, type ProcessingStep, type UploadedCV } from "@/types";
 
 export interface PipelineStage {
   id: "detect" | "read" | "understand" | "score" | "rank";
-  label: string;
   icon: IconName;
-  headline: string;
-  tips: string[];
   /** The CV step this stage tracks. The final "rank" stage has none. */
   step: ProcessingStep | null;
+  tipKeys: MessageKey[];
 }
 
 export const PIPELINE_STAGES: PipelineStage[] = [
-  {
-    id: "detect",
-    label: "Check",
-    icon: "scan",
-    headline: "Checking every file",
-    tips: [
-      "Telling scanned pages apart from regular PDFs.",
-      "Making sure nothing is corrupted or unreadable.",
-    ],
-    step: "detecting",
-  },
-  {
-    id: "read",
-    label: "Read",
-    icon: "file",
-    headline: "Reading each CV",
-    tips: [
-      "Arabic, English or a mix. We read them all.",
-      "Pulling text out of scanned pages too.",
-    ],
-    step: "reading",
-  },
-  {
-    id: "understand",
-    label: "Understand",
-    icon: "brain",
-    headline: "Finding skills and experience",
-    tips: [
-      "ReactJS, React.js and React count as one skill.",
-      "Working out real years of experience, without double counting.",
-    ],
-    step: "parsing",
-  },
-  {
-    id: "score",
-    label: "Score",
-    icon: "target",
-    headline: "Matching against your job",
-    tips: [
-      "Required skills count the most.",
-      "Anyone who misses a hard filter stays visible, with the reason.",
-    ],
-    step: "scoring",
-  },
-  {
-    id: "rank",
-    label: "Rank",
-    icon: "ranking",
-    headline: "Building your shortlist",
-    tips: ["Sorting by best match. You make the final call."],
-    step: null,
-  },
+  { id: "detect", icon: "scan", step: "detecting", tipKeys: ["processing.stage.detect.tip1", "processing.stage.detect.tip2"] },
+  { id: "read", icon: "file", step: "reading", tipKeys: ["processing.stage.read.tip1", "processing.stage.read.tip2"] },
+  { id: "understand", icon: "brain", step: "parsing", tipKeys: ["processing.stage.understand.tip1", "processing.stage.understand.tip2"] },
+  { id: "score", icon: "target", step: "scoring", tipKeys: ["processing.stage.score.tip1", "processing.stage.score.tip2"] },
+  { id: "rank", icon: "ranking", step: null, tipKeys: ["processing.stage.rank.tip1"] },
 ];
 
 /** How many pipeline steps a CV has fully passed (settled CVs count as all four). */

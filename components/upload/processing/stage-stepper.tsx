@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui";
 import { cn } from "@/components/ui/cn";
+import { useLocale } from "@/lib/i18n/locale-context";
 import { PIPELINE_STAGES } from "@/lib/processing";
 
 interface StageStepperProps {
@@ -9,8 +10,9 @@ interface StageStepperProps {
 
 /** Five-stage pipeline. Connectors fill as the batch moves through; the active stage pulses. */
 export function StageStepper({ progress, active }: StageStepperProps) {
+  const { t } = useLocale();
   return (
-    <ol className="flex items-start" aria-label="Processing stages">
+    <ol className="flex items-start" aria-label={t("processing.stagesAria")}>
       {PIPELINE_STAGES.map((stage, index) => {
         const complete = progress[index] >= 1;
         const current = index === active;
@@ -53,7 +55,7 @@ export function StageStepper({ progress, active }: StageStepperProps) {
                 !current && "max-sm:hidden",
               )}
             >
-              {stage.label}
+              {t(`processing.stage.${stage.id}.label`)}
             </span>
           </li>
         );

@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import {
   AnimatedNumber,
   Badge,
+  Button,
   Card,
+  ConfidenceIndicator,
   EmptyPanel,
   ErrorPanel,
   Icon,
@@ -13,22 +15,18 @@ import {
   StatusPill,
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
-import { cn, stagger } from "@/components/ui/cn";
-import { getProcessingStatus } from "@/lib/api";
+import { stagger } from "@/components/ui/cn";
+import { getProcessingStatus, retryFailedFiles } from "@/lib/api";
 import { track } from "@/lib/analytics";
 import { useLocale } from "@/lib/i18n/locale-context";
-import {
-  PIPELINE_STAGES,
-  activeStageIndex,
-  isFinished,
-  stageProgress,
-} from "@/lib/processing";
+import { PIPELINE_STAGES, activeStageIndex, isFinished, stageProgress } from "@/lib/processing";
 import type { ProcessingBatch } from "@/types";
 import { DocumentStack } from "./processing/document-stack";
 import { RotatingTip } from "./processing/rotating-tip";
 import { StageStepper } from "./processing/stage-stepper";
 
 const POLL_MS = 800;
+const ALL = "__all";
 
 type View =
   | { status: "loading" }
@@ -36,9 +34,10 @@ type View =
   | { status: "ready"; batch: ProcessingBatch | null };
 
 export function ProcessingView({ jobId }: { jobId: string }) {
-  const { tn } = useLocale();
+  const { t, tn } = useLocale();
   const [view, setView] = useState<View>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
+  const [retrying, setRetrying] = useState<string[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,39 +69,59 @@ export function ProcessingView({ jobId }: { jobId: string }) {
     };
   }, [jobId, attempt]);
 
-  function retry() {
+  function reload() {
     setView({ status: "loading" });
     setAttempt((count) => count + 1);
   }
 
-  if (view.status === "loading") return <LoadingPanel label="Checking progress…" />;
-  if (view.status === "error") {
-    return <ErrorPanel message="We couldn't check the progress." onRetry={retry} />;
+  /** Re-queues failed files and starts polling again (polling stops once a run is finished). */
+  async function retry(ids?: string[]) {
+    const keys = ids ?? [ALL];
+    setRetrying((current) => [...current, ...keys]);
+    try {
+      await retryFailedFiles(jobId, ids);
+      setAttempt((count) => count + 1);
+    } finally {
+      setRetrying((current) => current.filter((key) => !keys.includes(key)));
+    }
   }
+
+  if (view.status === "loading") return <LoadingPanel label={t("processing.loading")} />;
+  if (view.status === "error") return <ErrorPanel message={t("processing.error")} onRetry={reload} />;
 
   const { batch } = view;
   if (!batch) {
     return (
       <EmptyPanel
         icon="upload"
-        title="Nothing is being processed"
-        description="Upload a batch of CVs to get started."
-        action={{ href: `/jobs/${jobId}/upload`, label: "Upload CVs" }}
+        title={t("processing.empty.title")}
+        description={t("processing.empty.body")}
+        action={{ href: `/jobs/${jobId}/upload`, label: t("processing.empty.action") }}
       />
     );
   }
 
-  const { files } = batch;
+  const { files, etaSeconds } = batch;
   const total = files.length;
   const settled = files.filter((file) => file.status === "done" || file.status === "failed").length;
-  const failedCount = files.filter((file) => file.status === "failed").length;
+  const failedFiles = files.filter((file) => file.status === "failed");
   const duplicateCount = files.filter((file) => file.isDuplicate).length;
-  const scoredCount = settled - failedCount - duplicateCount;
+  const scoredFiles = files.filter((file) => file.status === "done" && !file.isDuplicate);
+  const reviewCount = scoredFiles.filter((file) => file.lowConfidence).length;
+  const ocrCount = scoredFiles.filter((file) => file.ocrUsed).length;
   const finished = isFinished(files);
 
   const progress = stageProgress(files);
   const activeIndex = activeStageIndex(progress);
   const stage = PIPELINE_STAGES[Math.min(activeIndex, PIPELINE_STAGES.length - 1)];
+  const headline = t(`processing.stage.${stage.id}.headline`);
+
+  const eta =
+    etaSeconds === null
+      ? null
+      : etaSeconds < 60
+        ? tn("processing.eta.seconds", etaSeconds)
+        : tn("processing.eta.minutes", Math.ceil(etaSeconds / 60));
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -115,27 +134,27 @@ export function ProcessingView({ jobId }: { jobId: string }) {
             <span className="flex size-24 animate-pop items-center justify-center rounded-full bg-match/15 text-match">
               <Icon name="check" variant="bold" size={52} />
             </span>
-            <div className="flex flex-col gap-2">
-              <h1 className="text-xl font-bold text-text-primary">Your shortlist is ready</h1>
+            <div className="flex flex-col items-center gap-2">
+              <h1 className="text-xl font-bold text-text-primary">{t("processing.done.title")}</h1>
               <p className="text-base text-text-secondary">
-                <span className="font-display font-bold text-text-primary">{scoredCount}</span> of{" "}
-                {total} CVs scored. A person should review every candidate before deciding.
+                {t("processing.done.summary", { scored: scoredFiles.length, total })}
               </p>
-              {failedCount > 0 && (
-                <p>
-                  <Badge tone="danger">{failedCount} couldn&apos;t be read</Badge>
-                </p>
-              )}
+              <div className="flex flex-wrap justify-center gap-2">
+                {reviewCount > 0 && (
+                  <Badge tone="warning">{tn("processing.summary.review", reviewCount)}</Badge>
+                )}
+                {ocrCount > 0 && <Badge>{tn("processing.summary.ocr", ocrCount)}</Badge>}
+              </div>
               {duplicateCount > 0 && (
                 <p className="text-sm text-text-secondary">{tn("processing.duplicates", duplicateCount)}</p>
               )}
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               <Link href={`/jobs/${jobId}/candidates`} className={buttonClass("primary", "lg")}>
-                See ranked candidates <Icon name="arrow-right" size={18} mirrorRtl />
+                {t("processing.done.cta")} <Icon name="arrow-right" size={18} mirrorRtl />
               </Link>
               <Link href={`/jobs/${jobId}/upload`} className={buttonClass("secondary", "lg")}>
-                Upload more
+                {t("processing.done.more")}
               </Link>
             </div>
           </>
@@ -144,29 +163,76 @@ export function ProcessingView({ jobId }: { jobId: string }) {
             <DocumentStack icon={stage.icon} stageKey={stage.id} />
             <div className="flex min-h-24 flex-col gap-2">
               <h1 key={`headline-${stage.id}`} className="animate-fade-up text-xl font-bold text-text-primary">
-                {stage.headline}
+                {headline}
               </h1>
-              <RotatingTip key={`tip-${stage.id}`} tips={stage.tips} />
+              <RotatingTip key={`tip-${stage.id}`} tips={stage.tipKeys.map((key) => t(key))} />
             </div>
             <div className="w-full max-w-xl">
               <StageStepper progress={progress} active={activeIndex} />
             </div>
-            <p className="text-base text-text-secondary">
-              <span className="font-display text-lg font-bold text-text-primary">
-                <AnimatedNumber value={settled} duration={400} />
-              </span>{" "}
-              of {total} CVs done. You can leave this page, it keeps going.
-            </p>
+            <div className="flex flex-col gap-1">
+              <p className="text-base text-text-secondary">
+                <span className="font-display text-lg font-bold text-text-primary">
+                  <AnimatedNumber value={settled} duration={400} />
+                </span>{" "}
+                {t("processing.progress", { total })}
+              </p>
+              {eta && <p className="text-sm font-semibold text-primary">{eta}</p>}
+            </div>
             <p role="status" className="sr-only">
-              {stage.headline}. {settled} of {total} CVs done.
+              {headline}. {settled} / {total}. {eta}
             </p>
           </>
         )}
       </Card>
 
+      {failedFiles.length > 0 && (
+        <Card className="flex animate-fade-up flex-col gap-3 border-danger/30">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary">
+              <Icon name="alert" variant="bold" className="text-danger" />
+              {tn("processing.failed.title", failedFiles.length)}
+            </h2>
+            {failedFiles.length > 1 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                loading={retrying.includes(ALL)}
+                onClick={() => retry()}
+              >
+                <Icon name="refresh" size={16} /> {t("processing.retryAll")}
+              </Button>
+            )}
+          </div>
+          <ul className="flex flex-col">
+            {failedFiles.map((file) => (
+              <li
+                key={file.id}
+                className="flex flex-wrap items-center justify-between gap-3 border-t border-border-default py-3 first:border-t-0 first:pt-0"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-base font-semibold text-text-primary">{file.fileName}</p>
+                  {file.error && <p className="text-sm text-text-secondary">{file.error}</p>}
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  loading={retrying.includes(file.id) || retrying.includes(ALL)}
+                  aria-label={t("processing.retryFile", { name: file.fileName })}
+                  onClick={() => retry([file.id])}
+                >
+                  <Icon name="refresh" size={16} /> {t("processing.retry")}
+                </Button>
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-text-secondary">{t("processing.failed.note")}</p>
+        </Card>
+      )}
+
       <details className="group rounded-xl border border-border-default bg-surface shadow-sm">
         <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-base font-semibold text-text-primary [&::-webkit-details-marker]:hidden">
-          See each file
+          {t("processing.files")}
           <Icon
             name="chevron-down"
             className="transition-transform duration-300 ease-[var(--ease-soft)] group-open:rotate-180"
@@ -176,25 +242,22 @@ export function ProcessingView({ jobId }: { jobId: string }) {
           {files.map((file, index) => (
             <li
               key={file.id}
-              className={cn(
-                "animate-stagger flex items-center gap-3 border-b border-border-default px-6 py-2.5 last:border-b-0",
-              )}
+              className="animate-stagger flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border-default px-6 py-2.5 last:border-b-0"
               style={stagger(index)}
             >
               <Icon name="file" size={18} className="text-text-secondary" />
               <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.fileName}</span>
+              {file.ocrUsed && (
+                <Badge title={t("processing.flag.ocr")} className="gap-1">
+                  <Icon name="scan" size={14} /> OCR
+                </Badge>
+              )}
+              {file.lowConfidence && <ConfidenceIndicator level="low" />}
               <StatusPill status={file.status} step={file.step} duplicate={file.isDuplicate} />
             </li>
           ))}
         </ul>
       </details>
-
-      {failedCount > 0 && finished && (
-        <p className="text-sm text-text-secondary">
-          Files we couldn&apos;t read aren&apos;t counted against your capacity. Re-upload a clearer
-          copy to try again. {/* TODO(spec): failed-file handling and capacity rules */}
-        </p>
-      )}
     </div>
   );
 }
