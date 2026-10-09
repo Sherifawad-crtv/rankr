@@ -1,3 +1,4 @@
+export { AnimatedNumber } from "./animated-number";
 export { Badge } from "./badge";
 export { Button, buttonClass } from "./button";
 export { Card } from "./card";
@@ -9,6 +10,9 @@ export { Icon, type IconName } from "./icons";
 export { Input, Select, Textarea } from "./input";
 export { Segmented } from "./segmented";
 export { EmptyPanel, ErrorPanel, LoadingPanel } from "./state-panels";
+export { Skeleton } from "./skeleton";
+export { Spinner } from "./spinner";
+export { StepTransition, type StepDirection } from "./step-transition";
 export { Table, Td, Th } from "./table";
 export { Tabs, type TabItem } from "./tabs";
 export { TierSlider } from "./tier-slider";

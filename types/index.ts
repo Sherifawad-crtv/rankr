@@ -93,13 +93,8 @@ export interface ParsedCV {
   confidence: number;
 }
 
-export type CandidateStage =
-  | "applied"
-  | "reviewing"
-  | "shortlisted"
-  | "interview"
-  | "offer"
-  | "closed";
+/** Pipeline stage a recruiter moves a candidate through. Interview scheduling is out of scope. */
+export type CandidateStage = "new" | "shortlisted" | "rejected" | "hired";
 
 export interface Candidate {
   id: string;
@@ -112,13 +107,20 @@ export interface Candidate {
   filteredOut: { reason: string } | null;
 }
 
-export type ProcessingStatus = "queued" | "processing" | "done" | "failed";
+export type ProcessingStatus = "pending" | "processing" | "done" | "failed";
+
+/** The steps a CV passes through while its status is "processing". */
+export type ProcessingStep = "detecting" | "reading" | "parsing" | "scoring";
+
+export const PROCESSING_STEPS: ProcessingStep[] = ["detecting", "reading", "parsing", "scoring"];
 
 export interface UploadedCV {
   id: string;
   jobId: string;
   fileName: string;
   status: ProcessingStatus;
+  /** Set while status is "processing", otherwise null. */
+  step: ProcessingStep | null;
 }
 
 /** The CVs submitted together for one job, with their processing progress. */
@@ -127,7 +129,7 @@ export interface ProcessingBatch {
   files: UploadedCV[];
 }
 
-/** Candidate-facing view: stage only, never scores or rankings. */
+/** Candidate-facing view: stage only, never scores or rankings. TODO(spec): candidate-facing stage labels. */
 export interface Application {
   id: string;
   jobId: string;

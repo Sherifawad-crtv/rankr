@@ -1,4 +1,4 @@
-import type { Candidate, ProcessingBatch, UploadedCV } from "@/types";
+import { PROCESSING_STEPS, type Candidate, type ProcessingBatch, type UploadedCV } from "@/types";
 import { mockCandidates, mockJobs, mockPlans } from "./data";
 
 interface StoredBatch {
@@ -9,8 +9,10 @@ interface StoredBatch {
 }
 
 const batches = new Map<string, StoredBatch>();
-const MAX_PER_FILE_MS = 1200;
-const MAX_TOTAL_MS = 8000;
+/** Each CV takes this long end to end, split evenly across the four steps. */
+const FILE_DURATION_MS = 5200;
+const MAX_STAGGER_MS = 140;
+const MAX_TOTAL_STAGGER_MS = 2400;
 
 function hash(text: string): number {
   let value = 0;
@@ -48,7 +50,7 @@ function candidateFromFile(jobId: string, id: string, fileName: string): Candida
       education: score(6),
       profileQuality: score(9),
     },
-    stage: "applied",
+    stage: "new",
     lowConfidence,
     filteredOut:
       seed % 7 === 0
@@ -72,19 +74,18 @@ export function readBatch(jobId: string): ProcessingBatch | null {
   const batch = batches.get(jobId);
   if (!batch) return null;
 
-  const perFile = Math.min(MAX_PER_FILE_MS, MAX_TOTAL_MS / batch.files.length);
+  const stagger = Math.min(MAX_STAGGER_MS, MAX_TOTAL_STAGGER_MS / batch.files.length);
   const elapsed = Date.now() - batch.startedAt;
+  const stepMs = FILE_DURATION_MS / PROCESSING_STEPS.length;
 
   const files: UploadedCV[] = batch.files.map((file, index) => {
-    const status =
-      elapsed < index * perFile
-        ? "queued"
-        : elapsed < (index + 1) * perFile
-          ? "processing"
-          : failed(file.fileName)
-            ? "failed"
-            : "done";
-    return { id: file.id, jobId, fileName: file.fileName, status };
+    const t = elapsed - index * stagger;
+    const base = { id: file.id, jobId, fileName: file.fileName };
+    if (t < 0) return { ...base, status: "pending", step: null };
+    // Unreadable files fail at the "reading" step.
+    if (failed(file.fileName) && t >= stepMs * 2) return { ...base, status: "failed", step: null };
+    if (t >= FILE_DURATION_MS) return { ...base, status: "done", step: null };
+    return { ...base, status: "processing", step: PROCESSING_STEPS[Math.floor(t / stepMs)] };
   });
 
   const finished = files.every((file) => file.status === "done" || file.status === "failed");

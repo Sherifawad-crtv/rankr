@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useCallback } from "react";
 import { PageHeader } from "@/components/shell/page-header";
+import { stagger } from "@/components/ui/cn";
 import {
+  AnimatedNumber,
   Badge,
   Card,
   EmptyPanel,
@@ -18,11 +20,27 @@ import { useAsync } from "@/lib/hooks/use-async";
 import { useSession } from "@/lib/session";
 import type { DashboardSummary } from "@/types";
 
-function Stat({ label, value, hint }: { label: string; value: number; hint: string }) {
+function Stat({
+  label,
+  value,
+  hint,
+  index,
+}: {
+  label: string;
+  value: number;
+  hint: string;
+  index: number;
+}) {
   return (
-    <Card className="col-span-2 flex flex-col gap-1 lg:col-span-3">
+    <Card
+      interactive
+      className="animate-stagger col-span-2 flex flex-col gap-1 lg:col-span-3"
+      style={stagger(index)}
+    >
       <p className="text-sm text-text-secondary">{label}</p>
-      <p className="text-xl font-medium text-text-primary">{value}</p>
+      <p className="font-display text-xl font-bold text-text-primary">
+        <AnimatedNumber value={value} />
+      </p>
       <p className="text-sm text-text-secondary">{hint}</p>
     </Card>
   );
@@ -31,9 +49,9 @@ function Stat({ label, value, hint }: { label: string; value: number; hint: stri
 function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
   const capacity = plan.cvCapacity;
   return (
-    <Card className="col-span-4 flex flex-col gap-3 lg:col-span-12">
+    <Card className="animate-stagger col-span-4 flex flex-col gap-3 lg:col-span-12" style={stagger(4)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-medium text-text-primary">CV capacity this cycle</h2>
+        <h2 className="text-lg font-semibold text-text-primary">CV capacity this cycle</h2>
         {/* TODO(spec): Solo capacity is OPEN */}
         <Badge tone="neutral">
           {capacity === null
@@ -52,7 +70,7 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
             className="h-2 overflow-hidden rounded-full bg-subtle"
           >
             <div
-              className="h-full bg-primary"
+              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)]"
               style={{ width: `${Math.min(100, (plan.cvUsed / capacity) * 100)}%` }}
             />
           </div>
@@ -92,23 +110,25 @@ export function DashboardView() {
         />
       ) : (
         <Grid>
-          <Stat label="Open jobs" value={openJobs.length} hint="Accepting candidates" />
-          <Stat label="Candidates" value={summary.totalCandidates} hint="Across all jobs" />
+          <Stat label="Open jobs" value={openJobs.length} hint="Accepting candidates" index={0} />
+          <Stat label="Candidates" value={summary.totalCandidates} hint="Across all jobs" index={1} />
           <Stat
             label="Needs a closer look"
             value={summary.needsReviewCount}
             hint="Low-confidence CVs to check by hand"
+            index={2}
           />
           <Stat
             label="Filtered out"
             value={summary.filteredOutCount}
             hint="Didn't meet a required filter"
+            index={3}
           />
 
           <CapacityCard plan={summary.plan} />
 
-          <Card className="col-span-4 flex flex-col gap-4 lg:col-span-7">
-            <h2 className="text-lg font-medium text-text-primary">Your jobs</h2>
+          <Card className="animate-stagger col-span-4 flex flex-col gap-4 lg:col-span-7" style={stagger(5)}>
+            <h2 className="text-lg font-semibold text-text-primary">Your jobs</h2>
             <ul className="flex flex-col">
               {summary.jobs.map((job) => (
                 <li
@@ -134,8 +154,8 @@ export function DashboardView() {
             </ul>
           </Card>
 
-          <Card className="col-span-4 flex flex-col gap-4 lg:col-span-5">
-            <h2 className="text-lg font-medium text-text-primary">Recently added candidates</h2>
+          <Card className="animate-stagger col-span-4 flex flex-col gap-4 lg:col-span-5" style={stagger(6)}>
+            <h2 className="text-lg font-semibold text-text-primary">Recently added candidates</h2>
             {summary.recentCandidates.length === 0 ? (
               <p className="text-sm text-text-secondary">
                 No candidates yet. Upload a batch of CVs to get started.

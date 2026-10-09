@@ -30,10 +30,10 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
         if (event.target === ref.current) onClose();
       }}
       aria-label={title}
-      className="m-auto w-full max-w-lg rounded-lg bg-surface p-0 text-text-primary shadow-lg backdrop:bg-inverse/50"
+      className="m-auto w-full max-w-lg rounded-xl bg-surface p-0 text-text-primary shadow-lg backdrop:bg-inverse/50"
     >
       <div className="flex items-center justify-between border-b border-border-default px-6 py-4">
-        <h2 className="text-lg font-medium">{title}</h2>
+        <h2 className="text-lg font-semibold">{title}</h2>
         <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
           <Icon name="close" />
         </Button>

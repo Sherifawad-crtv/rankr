@@ -2,32 +2,65 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/shell/page-header";
-import { Badge, Card, EmptyPanel, ErrorPanel, Icon, LoadingPanel } from "@/components/ui";
+import {
+  AnimatedNumber,
+  Badge,
+  Card,
+  EmptyPanel,
+  ErrorPanel,
+  Icon,
+  LoadingPanel,
+  Spinner,
+} from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
+import { cn, stagger } from "@/components/ui/cn";
 import { getProcessingStatus } from "@/lib/api";
-import type { ProcessingBatch, ProcessingStatus } from "@/types";
+import {
+  PIPELINE_STAGES,
+  activeStageIndex,
+  isFinished,
+  stageProgress,
+} from "@/lib/processing";
+import type { ProcessingBatch, ProcessingStatus, ProcessingStep } from "@/types";
+import { DocumentStack } from "./processing/document-stack";
+import { RotatingTip } from "./processing/rotating-tip";
+import { StageStepper } from "./processing/stage-stepper";
 
-const POLL_MS = 1000;
+const POLL_MS = 800;
 
-type View = { status: "loading" } | { status: "error" } | { status: "ready"; batch: ProcessingBatch | null };
+type View =
+  | { status: "loading" }
+  | { status: "error" }
+  | { status: "ready"; batch: ProcessingBatch | null };
 
-const statusLabel: Record<ProcessingStatus, string> = {
-  queued: "Queued",
-  processing: "Reading…",
-  done: "Scored",
-  failed: "Couldn't read",
+const stepLabel: Record<ProcessingStep, string> = {
+  detecting: "Checking",
+  reading: "Reading",
+  parsing: "Understanding",
+  scoring: "Scoring",
 };
 
 const statusTone: Record<ProcessingStatus, "neutral" | "primary" | "match" | "danger"> = {
-  queued: "neutral",
+  pending: "neutral",
   processing: "primary",
   done: "match",
   failed: "danger",
 };
 
-function isFinished(batch: ProcessingBatch): boolean {
-  return batch.files.every((file) => file.status === "done" || file.status === "failed");
+function FileStatus({ status, step }: { status: ProcessingStatus; step: ProcessingStep | null }) {
+  if (status === "processing") {
+    return (
+      <Badge tone="primary" className="gap-1.5">
+        <Spinner className="size-3" /> {step ? stepLabel[step] : "Working"}
+      </Badge>
+    );
+  }
+  const label: Record<Exclude<ProcessingStatus, "processing">, string> = {
+    pending: "Waiting",
+    done: "Scored",
+    failed: "Couldn't read",
+  };
+  return <Badge tone={statusTone[status]}>{label[status as Exclude<ProcessingStatus, "processing">]}</Badge>;
 }
 
 export function ProcessingView({ jobId }: { jobId: string }) {
@@ -43,7 +76,7 @@ export function ProcessingView({ jobId }: { jobId: string }) {
         const batch = await getProcessingStatus(jobId);
         if (cancelled) return;
         setView({ status: "ready", batch });
-        if (batch && !isFinished(batch)) timer = setTimeout(tick, POLL_MS);
+        if (batch && !isFinished(batch.files)) timer = setTimeout(tick, POLL_MS);
       } catch {
         if (!cancelled) setView({ status: "error" });
       }
@@ -70,6 +103,7 @@ export function ProcessingView({ jobId }: { jobId: string }) {
   if (!batch) {
     return (
       <EmptyPanel
+        icon="upload"
         title="Nothing is being processed"
         description="Upload a batch of CVs to get started."
         action={{ href: `/jobs/${jobId}/upload`, label: "Upload CVs" }}
@@ -77,77 +111,104 @@ export function ProcessingView({ jobId }: { jobId: string }) {
     );
   }
 
-  const total = batch.files.length;
-  const finishedCount = batch.files.filter(
-    (file) => file.status === "done" || file.status === "failed",
-  ).length;
-  const failedCount = batch.files.filter((file) => file.status === "failed").length;
-  const finished = isFinished(batch);
+  const { files } = batch;
+  const total = files.length;
+  const settled = files.filter((file) => file.status === "done" || file.status === "failed").length;
+  const failedCount = files.filter((file) => file.status === "failed").length;
+  const scoredCount = settled - failedCount;
+  const finished = isFinished(files);
+
+  const progress = stageProgress(files);
+  const activeIndex = activeStageIndex(progress);
+  const stage = PIPELINE_STAGES[Math.min(activeIndex, PIPELINE_STAGES.length - 1)];
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <PageHeader
-        title={finished ? "All done" : "Reading and scoring your CVs"}
-        description={
-          finished
-            ? `${total - failedCount} of ${total} CVs scored. Review them in your ranked list.`
-            : "You can leave this page. Processing continues in the background."
-        }
-      />
-
-      <Card className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <p className="text-base font-medium text-text-primary">
-            {finishedCount} of {total} processed
-          </p>
-          {failedCount > 0 && <Badge tone="danger">{failedCount} couldn&apos;t be read</Badge>}
-        </div>
-        <div
-          role="progressbar"
-          aria-label="Processing progress"
-          aria-valuemin={0}
-          aria-valuemax={total}
-          aria-valuenow={finishedCount}
-          className="h-2 overflow-hidden rounded-full bg-subtle"
-        >
-          <div
-            className="h-full bg-primary transition-all"
-            style={{ width: `${(finishedCount / total) * 100}%` }}
-          />
-        </div>
+      <Card
+        key={finished ? "done" : "running"}
+        className="flex animate-fade-up flex-col items-center gap-8 overflow-hidden bg-gradient-to-b from-primary/10 to-surface px-6 py-10 text-center"
+      >
+        {finished ? (
+          <>
+            <span className="flex size-24 animate-pop items-center justify-center rounded-full bg-match/15 text-match">
+              <Icon name="check" variant="bold" size={52} />
+            </span>
+            <div className="flex flex-col gap-2">
+              <h1 className="text-xl font-bold text-text-primary">Your shortlist is ready</h1>
+              <p className="text-base text-text-secondary">
+                <span className="font-display font-bold text-text-primary">{scoredCount}</span> of{" "}
+                {total} CVs scored. A person should review every candidate before deciding.
+              </p>
+              {failedCount > 0 && (
+                <p>
+                  <Badge tone="danger">{failedCount} couldn&apos;t be read</Badge>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Link href={`/jobs/${jobId}/candidates`} className={buttonClass("primary", "lg")}>
+                See ranked candidates <Icon name="arrow-right" size={18} mirrorRtl />
+              </Link>
+              <Link href={`/jobs/${jobId}/upload`} className={buttonClass("secondary", "lg")}>
+                Upload more
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <DocumentStack icon={stage.icon} stageKey={stage.id} />
+            <div className="flex min-h-24 flex-col gap-2">
+              <h1 key={`headline-${stage.id}`} className="animate-fade-up text-xl font-bold text-text-primary">
+                {stage.headline}
+              </h1>
+              <RotatingTip key={`tip-${stage.id}`} tips={stage.tips} />
+            </div>
+            <div className="w-full max-w-xl">
+              <StageStepper progress={progress} active={activeIndex} />
+            </div>
+            <p className="text-base text-text-secondary">
+              <span className="font-display text-lg font-bold text-text-primary">
+                <AnimatedNumber value={settled} duration={400} />
+              </span>{" "}
+              of {total} CVs done. You can leave this page, it keeps going.
+            </p>
+            <p role="status" className="sr-only">
+              {stage.headline}. {settled} of {total} CVs done.
+            </p>
+          </>
+        )}
       </Card>
 
-      <Card className="p-0">
-        <ul className="max-h-96 overflow-y-auto">
-          {batch.files.map((file) => (
+      <details className="group rounded-xl border border-border-default bg-surface shadow-sm">
+        <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-base font-semibold text-text-primary [&::-webkit-details-marker]:hidden">
+          See each file
+          <Icon
+            name="chevron-down"
+            className="transition-transform duration-300 ease-[var(--ease-soft)] group-open:rotate-180"
+          />
+        </summary>
+        <ul className="max-h-96 overflow-y-auto border-t border-border-default">
+          {files.map((file, index) => (
             <li
               key={file.id}
-              className="flex items-center gap-3 border-b border-border-default px-6 py-2 last:border-b-0"
+              className={cn(
+                "animate-stagger flex items-center gap-3 border-b border-border-default px-6 py-2.5 last:border-b-0",
+              )}
+              style={stagger(index)}
             >
-              <Icon name="file" size={18} className="shrink-0 text-text-secondary" />
+              <Icon name="file" size={18} className="text-text-secondary" />
               <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.fileName}</span>
-              <Badge tone={statusTone[file.status]}>{statusLabel[file.status]}</Badge>
+              <FileStatus status={file.status} step={file.step} />
             </li>
           ))}
         </ul>
-      </Card>
+      </details>
 
       {failedCount > 0 && finished && (
         <p className="text-sm text-text-secondary">
           Files we couldn&apos;t read aren&apos;t counted against your capacity. Re-upload a clearer
           copy to try again. {/* TODO(spec): failed-file handling and capacity rules */}
         </p>
-      )}
-
-      {finished && (
-        <div className="flex flex-wrap gap-2">
-          <Link href={`/jobs/${jobId}/candidates`} className={buttonClass("primary", "lg")}>
-            View ranked list
-          </Link>
-          <Link href={`/jobs/${jobId}/upload`} className={buttonClass("secondary", "lg")}>
-            Upload more
-          </Link>
-        </div>
       )}
     </div>
   );

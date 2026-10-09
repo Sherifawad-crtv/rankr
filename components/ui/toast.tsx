@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { cn } from "./cn";
+import { Icon } from "./icons";
 
 type ToastTone = "neutral" | "match" | "danger";
 
@@ -20,8 +21,14 @@ const DISMISS_MS = 4000;
 
 const tones: Record<ToastTone, string> = {
   neutral: "bg-inverse text-text-inverse",
-  match: "bg-match text-text-inverse",
-  danger: "bg-danger text-text-inverse",
+  match: "bg-inverse text-text-inverse",
+  danger: "bg-inverse text-text-inverse",
+};
+
+const toneIcon: Record<ToastTone, { name: "info" | "check" | "alert"; className: string }> = {
+  neutral: { name: "info", className: "text-text-inverse" },
+  match: { name: "check", className: "text-match" },
+  danger: { name: "alert", className: "text-danger" },
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -41,13 +48,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-4 flex flex-col items-center gap-2 px-4"
+        className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4"
       >
         {items.map((item) => (
           <div
             key={item.id}
-            className={cn("rounded-md px-4 py-2 text-base shadow-md", tones[item.tone])}
+            className={cn(
+              "flex animate-toast-in items-center gap-2 rounded-xl px-4 py-3 text-base font-medium shadow-lg",
+              tones[item.tone],
+            )}
           >
+            <Icon name={toneIcon[item.tone].name} variant="bold" className={toneIcon[item.tone].className} />
             {item.message}
           </div>
         ))}

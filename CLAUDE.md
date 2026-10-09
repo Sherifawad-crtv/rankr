@@ -32,6 +32,9 @@ Everything the back-end touches is reached through a **typed service layer** (`l
 - **Next.js (App Router) + React + TypeScript** — strict mode on.
 - **Tailwind CSS** with a token-driven theme (CSS variables → Tailwind config). No inline styles.
 - **Deploy target: Vercel.**
+- **Fonts (locked):** Urbanist for UI text, Space Grotesk for headings, numbers and scores (self-hosted via Fontsource). Arabic pairing comes with the Arabic phase.
+- **Icons (locked):** Solar icon set (480 Design, CC BY 4.0), copied into source by `scripts/generate-icons.mjs`. Add an icon by adding a line there and re-running it.
+- **Motion:** simple and purposeful (Airbnb-style): press and hover feedback, eased page and step transitions, skeleton loading. Always respect `prefers-reduced-motion` (handled globally in `app/globals.css`).
 - State: React state + context for app-level concerns (mock session, plan mode). No heavy state lib unless a screen genuinely needs it — ask first.
 - Forms: a single lightweight form approach, consistent across the app.
 
@@ -89,7 +92,7 @@ Each spec entry gives layout, components, content, states, and flow. They are in
 **Screen set (build order):**
 - **Entry funnel:** Plans → Create account → Verify email → Checkout → Workspace setup → Invite team (Enterprise only) → Welcome. (Solo path drops the tier slider + invite.)
 - **Recruiter app:** App shell · Dashboard · Job creation · CV upload · Processing · Ranked list · Candidate detail · CSV export · Messages · Analytics · Billing · Settings.
-- **Candidate portal:** Careers · Job detail · Application form · Submitted · Magic-link auth · My applications · Status detail · Messaging · Parsed-profile review · Privacy & data rights.
+- **Candidate portal (white-label per organisation: brand, colours and logo are customisable):** Careers · Job detail · Application form · Submitted · Magic-link auth · My applications · Status detail · Messaging · Parsed-profile review · Privacy & data rights.
 - **Admin:** Companies & users · Job moderation · Reports & block list · Bias audit · Pilot onboarding.
 
 ---
@@ -107,6 +110,7 @@ Each spec entry gives layout, components, content, states, and flow. They are in
 - **Data minimization:** never render or collect gender, age, religion, marital status, or photo — not in forms, not in parsed profiles.
 - **Consent gate:** no CV submission/processing path without an explicit, unticked-by-default consent checkbox.
 - **Confidence-aware:** low parse-confidence candidates carry a visible flag wherever they appear.
+- **No interview scheduling.** Candidate stages are `new / shortlisted / rejected / hired`. A person moves a candidate; the system never auto-rejects.
 - **Candidate visibility:** candidates see application **stage only** — never scores or rankings.
 - **Hard-filter transparency:** knocked-out candidates appear in a visible "filtered-out" group with the reason — never silently dropped.
 
@@ -115,7 +119,7 @@ Each spec entry gives layout, components, content, states, and flow. They are in
 ## OPEN items — do not hardcode, leave `TODO(spec):` and ask
 1. **Solo CV capacity** (placeholder 100/cycle; collides with Enterprise floor — number + monthly vs cycle unset).
 2. **Prices** — Solo price, the four Enterprise tier prices, Yearly discount %.
-3. **Design token values** (brand colours, type) — use placeholders until supplied.
+3. ~~Design token values~~ — colours, fonts and icons are now locked; only per-organisation white-label theming remains to be designed.
 
 ## Definition of done (hand-off bar)
 - All screens + states build from mocks; `build`, `lint`, `typecheck` green.

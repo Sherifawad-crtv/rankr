@@ -12,12 +12,14 @@ export function StepProgress({ steps, current }: { steps: string[]; current: num
             aria-current={active ? "step" : undefined}
             className="flex flex-1 flex-col gap-1"
           >
-            <span
-              className={cn(
-                "h-1.5 rounded-full transition-colors",
-                done || active ? "bg-primary" : "bg-border-default",
-              )}
-            />
+            <span className="h-1.5 overflow-hidden rounded-full bg-border-default">
+              <span
+                className={cn(
+                  "block h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-[var(--ease-soft)] rtl:origin-right",
+                  done || active ? "scale-x-100" : "scale-x-0",
+                )}
+              />
+            </span>
             <span
               className={cn(
                 "text-sm",

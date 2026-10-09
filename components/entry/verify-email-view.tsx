@@ -48,7 +48,7 @@ export function VerifyEmailView({ email, selection }: { email: string; selection
         <Icon name="message" size={24} />
       </span>
       <div className="flex flex-col gap-2">
-        <h1 className="text-xl font-medium text-text-primary">Check your inbox</h1>
+        <h1 className="text-xl font-bold text-text-primary">Check your inbox</h1>
         <p className="text-base text-text-secondary">
           We sent a verification link to{" "}
           <span className="font-medium text-text-primary">{email}</span>. Open it to continue to

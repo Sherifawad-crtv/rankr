@@ -54,7 +54,7 @@ export function PlansView() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-xl font-medium text-text-primary">Choose your plan</h1>
+        <h1 className="text-xl font-bold text-text-primary">Choose your plan</h1>
         <p className="max-w-xl text-base text-text-secondary">
           Pricing is based on CV capacity per cycle, not seats.
         </p>
@@ -63,7 +63,7 @@ export function PlansView() {
 
       <Grid>
         <Card className="col-span-4 flex flex-col gap-6 lg:col-span-5 lg:col-start-2">
-          <h2 className="text-lg font-medium text-text-primary">Solo</h2>
+          <h2 className="text-lg font-semibold text-text-primary">Solo</h2>
           <PriceDisplay
             perMonth={soloPrice}
             currency={pricing.currency}
@@ -85,7 +85,7 @@ export function PlansView() {
         </Card>
 
         <Card className="col-span-4 flex flex-col gap-6 lg:col-span-5">
-          <h2 className="text-lg font-medium text-text-primary">Enterprise</h2>
+          <h2 className="text-lg font-semibold text-text-primary">Enterprise</h2>
           <TierSlider value={tier} onChange={setTier} />
           <PriceDisplay
             perMonth={enterprisePrice}

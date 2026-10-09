@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { Button, Card, ChoiceChips, Icon, Input } from "@/components/ui";
+import { Button, Card, ChoiceChips, Icon, Input, StepTransition, type StepDirection } from "@/components/ui";
 import { createWorkspace } from "@/lib/api";
 import { planQuery } from "@/lib/entry-flow";
 import { useAccountProfile } from "@/lib/hooks/use-account-profile";
@@ -29,6 +29,7 @@ function WorkspaceForm({
 }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState<StepDirection>("forward");
   const [companyName, setCompanyName] = useState("");
   const [companySize, setCompanySize] = useState<CompanySize | null>(null);
   const [fullName, setFullName] = useState(profile.fullName);
@@ -57,7 +58,10 @@ function WorkspaceForm({
     if (step < STEPS.length - 1) {
       const found = validateStep();
       setErrors(found);
-      if (Object.keys(found).length === 0) setStep(step + 1);
+      if (Object.keys(found).length === 0) {
+        setDirection("forward");
+        setStep(step + 1);
+      }
       return;
     }
 
@@ -83,13 +87,14 @@ function WorkspaceForm({
     <Card className="mx-auto flex w-full max-w-lg flex-col gap-6">
       <div className="flex items-center gap-4">
         <span
+          key={companyLabel.charAt(0).toUpperCase()}
           aria-hidden
-          className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-primary text-xl font-semibold text-text-inverse"
+          className="flex size-14 shrink-0 animate-pop items-center justify-center rounded-xl bg-primary font-display text-xl font-bold text-text-inverse shadow-md"
         >
           {companyLabel.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-lg font-medium text-text-primary">{companyLabel}</p>
+          <p className="truncate text-lg font-semibold text-text-primary">{companyLabel}</p>
           <p className="text-sm text-text-secondary">Your new Rankr workspace</p>
         </div>
       </div>
@@ -97,11 +102,11 @@ function WorkspaceForm({
       <StepProgress steps={STEPS} current={step} />
 
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-        <div key={step} className="flex flex-col gap-4 motion-safe:animate-step-in">
+        <StepTransition stepKey={step} direction={direction} className="flex flex-col gap-4">
           {step === 0 && (
             <>
               <div>
-                <h1 className="text-xl font-medium text-text-primary">Let&apos;s name your workspace</h1>
+                <h1 className="text-xl font-bold text-text-primary">Let&apos;s name your workspace</h1>
                 <p className="mt-1 text-base text-text-secondary">
                   This is where your team will rank and review CVs.
                 </p>
@@ -127,7 +132,7 @@ function WorkspaceForm({
           {step === 1 && (
             <>
               <div>
-                <h1 className="text-xl font-medium text-text-primary">Nice to meet you!</h1>
+                <h1 className="text-xl font-bold text-text-primary">Nice to meet you!</h1>
                 <p className="mt-1 text-base text-text-secondary">
                   A little about you, so colleagues know who&apos;s who.
                 </p>
@@ -155,7 +160,7 @@ function WorkspaceForm({
           {step === 2 && (
             <>
               <div>
-                <h1 className="text-xl font-medium text-text-primary">
+                <h1 className="text-xl font-bold text-text-primary">
                   Ready to launch, {firstName}?
                 </h1>
                 <p className="mt-1 text-base text-text-secondary">
@@ -185,17 +190,24 @@ function WorkspaceForm({
               )}
             </>
           )}
-        </div>
+        </StepTransition>
 
         <div className="flex items-center justify-between gap-3">
           {step > 0 ? (
-            <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={submitting}>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setDirection("back");
+                setStep(step - 1);
+              }}
+              disabled={submitting}
+            >
               <Icon name="chevron-right" size={16} className="rotate-180 rtl:rotate-0" /> Back
             </Button>
           ) : (
             <span />
           )}
-          <Button type="submit" size="lg" disabled={submitting}>
+          <Button type="submit" size="lg" loading={submitting}>
             {step < STEPS.length - 1
               ? "Continue"
               : submitting

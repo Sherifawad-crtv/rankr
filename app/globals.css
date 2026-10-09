@@ -19,6 +19,7 @@
   --color-danger: var(--color-status-danger);
 
   --font-sans: var(--font-family-base);
+  --font-display: var(--font-family-display);
 
   --radius-xs: var(--radius-xs);
   --radius-sm: var(--radius-sm);
@@ -29,18 +30,28 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
-}
 
-body {
-  background: var(--color-bg-canvas);
-  color: var(--color-text-primary);
-  font-family: var(--font-family-base);
+  --ease-soft: var(--ease-soft);
+  --ease-spring: var(--ease-spring);
 }
 
 @theme {
-  --animate-step-in: step-in 250ms ease-out;
+  --animate-page-in: page-in 350ms var(--ease-soft) both;
+  --animate-step-forward: step-forward 320ms var(--ease-soft) both;
+  --animate-step-back: step-back 320ms var(--ease-soft) both;
+  --animate-fade-up: fade-up 420ms var(--ease-soft) both;
+  --animate-pop: pop 380ms var(--ease-spring) both;
+  --animate-shake: shake 360ms ease-in-out;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-toast-in: toast-in 320ms var(--ease-spring) both;
+  --animate-float: float 3.6s ease-in-out infinite;
+  --animate-scan: scan 2.2s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 1.8s ease-out infinite;
+  --animate-spin-slow: spin 1.1s linear infinite;
+  --animate-bounce-soft: bounce-soft 0.9s var(--ease-soft) infinite;
+  --animate-line-fill: line-fill 2.4s ease-in-out infinite;
 
-  @keyframes step-in {
+  @keyframes page-in {
     from {
       opacity: 0;
       transform: translateY(0.5rem);
@@ -49,5 +60,237 @@ body {
       opacity: 1;
       transform: none;
     }
+  }
+  @keyframes step-forward {
+    from {
+      opacity: 0;
+      transform: translateX(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes step-back {
+    from {
+      opacity: 0;
+      transform: translateX(-1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-4px);
+    }
+    40% {
+      transform: translateX(4px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(1rem) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(var(--tilt, 0deg));
+    }
+    50% {
+      transform: translateY(-0.5rem) rotate(var(--tilt, 0deg));
+    }
+  }
+  @keyframes scan {
+    0% {
+      top: 6%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      top: 92%;
+      opacity: 0;
+    }
+  }
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-interactive-primary) 45%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 0.9rem transparent;
+    }
+  }
+  @keyframes bounce-soft {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.35rem);
+    }
+  }
+  @keyframes line-fill {
+    0% {
+      transform: scaleX(0.15);
+    }
+    60%,
+    100% {
+      transform: scaleX(1);
+    }
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-family-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Native dialog: fade and rise in, fade out. Falls back to instant where unsupported. */
+  dialog {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+    transition:
+      opacity var(--motion-base) var(--ease-soft),
+      transform var(--motion-base) var(--ease-soft),
+      overlay var(--motion-base) allow-discrete,
+      display var(--motion-base) allow-discrete;
+  }
+  dialog[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    dialog[open] {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.98);
+    }
+  }
+  dialog::backdrop {
+    background: color-mix(in srgb, var(--color-bg-inverse) 45%, transparent);
+    opacity: 0;
+    backdrop-filter: blur(2px);
+    transition:
+      opacity var(--motion-base) var(--ease-soft),
+      overlay var(--motion-base) allow-discrete,
+      display var(--motion-base) allow-discrete;
+  }
+  dialog[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* Side drawer variant: slides in from the start edge (mirrors in RTL). */
+  dialog[data-drawer] {
+    transform: translateX(-100%);
+  }
+  :dir(rtl) dialog[data-drawer] {
+    transform: translateX(100%);
+  }
+  dialog[data-drawer][open] {
+    transform: none;
+  }
+  @starting-style {
+    dialog[data-drawer][open] {
+      transform: translateX(-100%);
+    }
+    :dir(rtl) dialog[data-drawer][open] {
+      transform: translateX(100%);
+    }
+  }
+}
+
+/* Staggered entrance: set --i on each item (see stagger() in components/ui/cn.ts). */
+@utility animate-stagger {
+  animation: fade-up 420ms var(--ease-soft) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@utility skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    color-mix(in srgb, var(--color-bg-subtle) 55%, var(--color-bg-surface)) 50%,
+    var(--color-bg-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { PageHeader } from "@/components/shell/page-header";
+import { stagger } from "@/components/ui/cn";
 import {
   Badge,
   Button,
@@ -119,7 +120,7 @@ export function UploadView({ jobId }: { jobId: string }) {
             className="h-2 overflow-hidden rounded-full bg-subtle"
           >
             <div
-              className="h-full bg-primary"
+              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)]"
               style={{ width: `${Math.min(100, (plan.cvUsed / plan.cvCapacity) * 100)}%` }}
             />
           </div>
@@ -151,10 +152,11 @@ export function UploadView({ jobId }: { jobId: string }) {
             </Button>
           </div>
           <ul className="max-h-80 overflow-y-auto border-t border-border-default">
-            {files.map((file) => (
+            {files.map((file, index) => (
               <li
                 key={fileKey(file)}
-                className="flex items-center gap-3 border-b border-border-default px-6 py-2 last:border-b-0"
+                className="animate-stagger flex items-center gap-3 border-b border-border-default px-6 py-2 last:border-b-0"
+                style={stagger(index)}
               >
                 <Icon name="file" size={18} className="shrink-0 text-text-secondary" />
                 <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.name}</span>
@@ -196,7 +198,7 @@ export function UploadView({ jobId }: { jobId: string }) {
             We couldn&apos;t start processing. Please try again.
           </p>
         )}
-        <Button size="lg" disabled={!canSubmit} onClick={onSubmit}>
+        <Button size="lg" disabled={!canSubmit} loading={submitting} onClick={onSubmit}>
           {submitting ? "Uploading…" : `Process ${files.length || ""} ${files.length === 1 ? "CV" : "CVs"}`}
         </Button>
       </Card>

@@ -29,14 +29,23 @@ export function Dropzone({ accept, hint, onFiles }: DropzoneProps) {
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "flex flex-col items-center gap-3 rounded-lg border-2 border-dashed px-6 py-12 text-center transition-colors",
-        dragging ? "border-primary bg-primary/5" : "border-border-default bg-surface",
+        "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-all duration-300 ease-[var(--ease-soft)]",
+        dragging
+          ? "scale-[1.015] border-primary bg-primary/5 shadow-md"
+          : "border-border-default bg-surface hover:border-primary/60",
       )}
     >
-      <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Icon name="upload" size={24} />
+      <span
+        className={cn(
+          "flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 ease-[var(--ease-spring)]",
+          dragging && "scale-110 animate-bounce-soft",
+        )}
+      >
+        <Icon name="upload" variant="bold" size={28} />
       </span>
-      <p className="text-lg font-medium text-text-primary">Drag and drop CVs here</p>
+      <p className="font-display text-lg font-semibold text-text-primary">
+        {dragging ? "Drop to add them" : "Drag and drop CVs here"}
+      </p>
       <p className="text-sm text-text-secondary">{hint}</p>
       <Button variant="secondary" onClick={() => inputRef.current?.click()}>
         Choose files

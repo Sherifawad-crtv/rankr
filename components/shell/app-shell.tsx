@@ -7,7 +7,17 @@ import { DevSwitcher } from "./dev-switcher";
 import { NavLinks } from "./nav-links";
 
 function Brand() {
-  return <span className="text-lg font-semibold text-text-primary">Rankr</span>;
+  return (
+    <span className="flex items-center gap-2 font-display text-lg font-bold text-text-primary">
+      <span
+        aria-hidden
+        className="flex size-7 items-center justify-center rounded-lg bg-primary text-text-inverse"
+      >
+        <Icon name="ranking" variant="bold" size={16} />
+      </span>
+      Rankr
+    </span>
+  );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -40,6 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           if (event.target === drawerRef.current) setDrawerOpen(false);
         }}
         aria-label="Navigation"
+        data-drawer
         className="m-0 h-full max-h-none w-64 max-w-[80vw] bg-surface p-4 backdrop:bg-inverse/50"
       >
         <div className="mb-6 flex items-center justify-between px-3 pt-2">
@@ -62,7 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-label="Open menu"
             onClick={() => setDrawerOpen(true)}
           >
-            <Icon name="list" />
+            <Icon name="menu" />
           </Button>
           <div className="lg:hidden">
             <Brand />
@@ -70,7 +81,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="ms-auto flex flex-wrap items-center gap-3">
             <DevSwitcher />
             <Badge tone="primary">{user.planMode === "solo" ? "Solo" : "Enterprise"}</Badge>
-            <span className="text-sm text-text-secondary">{user.name}</span>
+            <span
+              aria-hidden
+              className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"
+            >
+              {user.name.charAt(0)}
+            </span>
+            <span className="sr-only">{user.name}</span>
           </div>
         </header>
         <main className="mx-auto w-full max-w-[90rem] flex-1 px-4 py-6 lg:px-8">{children}</main>

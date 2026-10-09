@@ -7,6 +7,28 @@ Priority tags follow the PRD: **P0** must ship in v1.0, **P1** v1.0 but cuttable
 
 ---
 
+## Decisions log
+
+Answers to the open questions in this plan, as given by the product owner.
+
+| Topic | Decision |
+|---|---|
+| Candidate portal | **In.** It is white-label per organisation (brand, colours, logo). Tokens must be runtime-overridable. |
+| Pricing | Keep `CLAUDE.md` pricing as is. Business side will edit later. |
+| Scope list conflict | The product owner's answers win over the PRD where they differ. |
+| Candidate stages | `new / shortlisted / rejected / hired`. No interview or scheduling. |
+| Mobile | Responsive web only, as is. |
+| Monorepo | Keep as is (single repo). |
+| UI language | English first, then Arabic with RTL. |
+| Roles | Three roles: Rankr staff, company admin, recruiter. |
+| Candidate messaging | Add it. |
+| Fonts | **Urbanist** (UI) + **Space Grotesk** (headings, numbers). |
+| Icons | **Solar** icon set. |
+| Roadmap | Do all six phases. |
+| Style direction | Tech-forward, Airbnb-like: friendly, lively micro-interactions, simple, nothing flashy. |
+
+---
+
 ## 1. What Rankr is (my understanding)
 
 Rankr is an AI CV-ranking assistant for HR generalists at Egyptian SMEs (10-200 employees). They handle

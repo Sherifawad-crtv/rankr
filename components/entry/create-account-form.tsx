@@ -70,7 +70,7 @@ export function CreateAccountForm({ selection }: { selection: PlanSelection }) {
   return (
     <Card className="mx-auto flex w-full max-w-md flex-col gap-6">
       <div>
-        <h1 className="text-xl font-medium text-text-primary">Create your account</h1>
+        <h1 className="text-xl font-bold text-text-primary">Create your account</h1>
         <p className="mt-1 text-base text-text-secondary">
           We&apos;ll email you a link to verify your address before checkout.
         </p>
@@ -114,7 +114,7 @@ export function CreateAccountForm({ selection }: { selection: PlanSelection }) {
             {errors.form}
           </p>
         )}
-        <Button type="submit" size="lg" disabled={submitting}>
+        <Button type="submit" size="lg" loading={submitting}>
           {submitting ? "Creating account…" : "Create account"}
         </Button>
       </form>

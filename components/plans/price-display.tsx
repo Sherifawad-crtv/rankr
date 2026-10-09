@@ -17,7 +17,7 @@ export function PriceDisplay({ perMonth, currency, cycle, savingsPercent }: Pric
   return (
     <div className="flex flex-col gap-1">
       <p className="flex items-baseline gap-1">
-        <span className="text-xl font-medium text-text-primary">{formatPrice(perMonth, currency)}</span>
+        <span className="text-xl font-bold text-text-primary">{formatPrice(perMonth, currency)}</span>
         <span className="text-base text-text-secondary">/ month</span>
         {cycle === "yearly" && savingsPercent !== null && (
           <Badge tone="match" className="ms-2">

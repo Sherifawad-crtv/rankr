@@ -30,10 +30,10 @@ export function ChoiceChips<T extends string>({
               aria-checked={selected}
               onClick={() => onChange(option)}
               className={cn(
-                "rounded-full border px-4 py-1.5 text-base",
+                "rounded-full border px-4 py-1.5 text-base transition-all duration-150 ease-[var(--ease-soft)] active:scale-95",
                 focusRing,
                 selected
-                  ? "border-primary bg-primary/10 font-medium text-primary"
+                  ? "animate-pop border-primary bg-primary/10 font-semibold text-primary"
                   : "border-border-default bg-surface text-text-secondary hover:border-primary hover:text-text-primary",
               )}
             >

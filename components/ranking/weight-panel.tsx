@@ -17,7 +17,7 @@ export function WeightPanel({ weights, onChange, onReset }: WeightPanelProps) {
     <Card className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-medium text-text-primary">Scoring weights</h2>
+          <h2 className="text-lg font-semibold text-text-primary">Scoring weights</h2>
           <p className="text-sm text-text-secondary">
             Adjust what matters most. The list re-ranks instantly and always totals {weightsTotal(weights)}%.
           </p>

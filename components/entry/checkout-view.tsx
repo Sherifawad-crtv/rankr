@@ -73,7 +73,7 @@ export function CheckoutView({ selection }: { selection: PlanSelection }) {
   return (
     <Card className="mx-auto flex w-full max-w-lg flex-col gap-6">
       <div>
-        <h1 className="text-xl font-medium text-text-primary">Checkout</h1>
+        <h1 className="text-xl font-bold text-text-primary">Checkout</h1>
         <p className="mt-1 text-base text-text-secondary">
           Review your order. Payment is handled on a secure page.
         </p>
@@ -99,7 +99,7 @@ export function CheckoutView({ selection }: { selection: PlanSelection }) {
         </p>
       )}
 
-      <Button size="lg" disabled={paying} onClick={onPay}>
+      <Button size="lg" loading={paying} onClick={onPay}>
         {paying ? "Processing…" : "Continue to payment"}
       </Button>
       <Link

@@ -43,11 +43,11 @@ export function Tabs({ items, defaultId }: { items: TabItem[]; defaultId?: strin
               onClick={() => setActiveId(item.id)}
               onKeyDown={(event) => onKeyDown(event, index)}
               className={cn(
-                "-mb-px border-b-2 px-4 py-2 text-base font-medium",
+                "relative px-4 py-2 text-base font-semibold transition-colors duration-150 after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-center after:rounded-full after:bg-primary after:transition-transform after:duration-300 after:ease-[var(--ease-soft)]",
                 focusRing,
                 selected
-                  ? "border-primary text-primary"
-                  : "border-transparent text-text-secondary hover:text-text-primary",
+                  ? "text-primary after:scale-x-100"
+                  : "text-text-secondary after:scale-x-0 hover:text-text-primary",
               )}
             >
               {item.label}
@@ -62,7 +62,7 @@ export function Tabs({ items, defaultId }: { items: TabItem[]; defaultId?: strin
           id={`${base}-panel-${item.id}`}
           aria-labelledby={`${base}-tab-${item.id}`}
           hidden={item.id !== activeId}
-          className="pt-4"
+          className="animate-fade-up pt-4"
         >
           {item.content}
         </div>

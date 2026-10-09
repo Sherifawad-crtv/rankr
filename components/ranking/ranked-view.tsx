@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type Ref } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import {
+  AnimatedNumber,
   Badge,
   Card,
   EmptyPanel,
@@ -17,6 +18,8 @@ import {
 import { buttonClass } from "@/components/ui/button";
 import { getJob, listCandidates } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
+import { useFlip } from "@/lib/hooks/use-flip";
+import { stagger } from "@/components/ui/cn";
 import { rankCandidates, rebalanceWeights, weightedScore } from "@/lib/scoring";
 import { DEFAULT_SCORE_WEIGHTS, type Candidate, type ScoreDimension, type ScoreWeights } from "@/types";
 import { WeightPanel } from "./weight-panel";
@@ -39,6 +42,8 @@ export function RankedView({ jobId }: { jobId: string }) {
     () => rankCandidates(candidates ?? [], weights),
     [candidates, weights],
   );
+
+  const rowRef = useFlip(ranked.map((candidate) => candidate.id));
 
   if (state.status === "loading") return <LoadingPanel label="Loading candidates…" />;
   if (state.status === "error") {
@@ -93,7 +98,7 @@ export function RankedView({ jobId }: { jobId: string }) {
           />
 
           <section aria-labelledby="ranked-heading" className="flex flex-col gap-3">
-            <h2 id="ranked-heading" className="text-lg font-medium text-text-primary">
+            <h2 id="ranked-heading" className="text-lg font-semibold text-text-primary">
               Ranked ({ranked.length})
             </h2>
             <Table>
@@ -111,14 +116,21 @@ export function RankedView({ jobId }: { jobId: string }) {
               </thead>
               <tbody>
                 {ranked.map((candidate, index) => (
-                  <CandidateRow key={candidate.id} candidate={candidate} rank={index + 1} weights={weights} />
+                  <CandidateRow
+                    key={candidate.id}
+                    ref={rowRef(candidate.id)}
+                    candidate={candidate}
+                    rank={index + 1}
+                    index={index}
+                    weights={weights}
+                  />
                 ))}
               </tbody>
             </Table>
           </section>
 
           <section aria-labelledby="filtered-heading" className="flex flex-col gap-3">
-            <h2 id="filtered-heading" className="text-lg font-medium text-text-primary">
+            <h2 id="filtered-heading" className="text-lg font-semibold text-text-primary">
               Filtered out ({filteredOut.length})
             </h2>
             <p className="text-sm text-text-secondary">
@@ -162,14 +174,22 @@ export function RankedView({ jobId }: { jobId: string }) {
 function CandidateRow({
   candidate,
   rank,
+  index,
   weights,
+  ref,
 }: {
   candidate: Candidate;
   rank: number;
+  index: number;
   weights: ScoreWeights;
+  ref: Ref<HTMLTableRowElement>;
 }) {
   return (
-    <tr>
+    <tr
+      ref={ref}
+      className="animate-stagger transition-colors hover:bg-subtle/60"
+      style={stagger(index)}
+    >
       <Td className="text-text-secondary">{rank}</Td>
       <Td>
         <span className="flex flex-wrap items-center gap-2">
@@ -178,7 +198,9 @@ function CandidateRow({
         </span>
       </Td>
       <Td>
-        <span className="font-medium text-primary">{Math.round(weightedScore(candidate, weights))}</span>
+        <span className="font-display text-lg font-bold text-primary">
+          <AnimatedNumber value={Math.round(weightedScore(candidate, weights))} duration={350} />
+        </span>
       </Td>
       <Td>{candidate.breakdown.skills}</Td>
       <Td>{candidate.breakdown.experience}</Td>
