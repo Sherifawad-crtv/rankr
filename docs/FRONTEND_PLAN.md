@@ -286,7 +286,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 2. ~~Upload fixes: cap, rate limit, duplicates, progress (M)~~ **done**
 3. ~~Processing fixes: retry, OCR and confidence flags (M)~~ **done**
 4. ~~Ranked list v2: match %, chips, rationale, filters, bulk actions (L)~~ **done**
-5. Candidate detail with CV viewer and Shortlist/Reject/Hire (L)
+5. ~~Candidate detail with CV viewer and Shortlist/Reject/Hire (L)~~ **done** (CV opens through a private expiring link; there is no embedded viewer)
 6. CSV export with Excel-safe Arabic (S)
 7. Dashboard rework and onboarding checklist (M)
 

@@ -52,7 +52,8 @@ export function RankedView({ jobId }: { jobId: string }) {
   const load = useCallback(() => Promise.all([getJob(jobId), listCandidates(jobId)]), [jobId]);
   const { state, retry } = useAsync(load);
 
-  const [weights, setWeights] = useState<ScoreWeights>(DEFAULT_SCORE_WEIGHTS);
+  // null means "use the job's saved weights"; a value is a temporary what-if for this visit.
+  const [customWeights, setCustomWeights] = useState<ScoreWeights | null>(null);
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [lowOnly, setLowOnly] = useState(false);
@@ -62,6 +63,8 @@ export function RankedView({ jobId }: { jobId: string }) {
   const [acting, setActing] = useState(false);
   const [confirmReject, setConfirmReject] = useState(false);
 
+  const jobWeights = state.status === "ready" ? (state.data[0]?.weights ?? DEFAULT_SCORE_WEIGHTS) : DEFAULT_SCORE_WEIGHTS;
+  const weights = customWeights ?? jobWeights;
   const loaded = state.status === "ready" ? state.data[1] : null;
   const candidates = useMemo(
     () => (loaded ?? []).map((c) => (overrides[c.id] ? { ...c, stage: overrides[c.id] } : c)),
@@ -129,7 +132,7 @@ export function RankedView({ jobId }: { jobId: string }) {
     );
   }
 
-  const weightsCustomised = SCORE_DIMENSIONS.some((d) => weights[d] !== DEFAULT_SCORE_WEIGHTS[d]);
+  const weightsCustomised = SCORE_DIMENSIONS.some((d) => weights[d] !== jobWeights[d]);
 
   async function changeStage(stage: CandidateStage) {
     const ids = actionable;
@@ -238,9 +241,9 @@ export function RankedView({ jobId }: { jobId: string }) {
                 weights={weights}
                 onChange={(dimension: ScoreDimension, value: number) => {
                   track({ name: "weights_changed" });
-                  setWeights((current) => rebalanceWeights(current, dimension, value));
+                  setCustomWeights(rebalanceWeights(weights, dimension, value));
                 }}
-                onReset={() => setWeights(DEFAULT_SCORE_WEIGHTS)}
+                onReset={() => setCustomWeights(null)}
               />
             </div>
           </details>

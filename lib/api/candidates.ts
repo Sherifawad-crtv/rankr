@@ -1,6 +1,7 @@
 import { mockCandidates } from "@/lib/mocks/data";
 import { simulateLatency, simulateList } from "@/lib/mocks/latency";
-import type { Candidate, CandidateStage } from "@/types";
+import { getMockScenario } from "@/lib/mocks/scenario";
+import type { Candidate, CandidateStage, CvLink } from "@/types";
 
 // TODO(backend): wire to real endpoint
 export async function listCandidates(jobId: string): Promise<Candidate[]> {
@@ -19,4 +20,13 @@ export async function setCandidateStage(candidateIds: string[], stage: Candidate
     if (candidateIds.includes(candidate.id)) candidate.stage = stage;
   }
   await simulateLatency(undefined, 500);
+}
+
+// TODO(backend): wire to real endpoint. Returns a signed URL to the private CV file that expires
+// after one hour. CVs are never exposed through public links.
+export async function getCandidateCvLink(candidateId: string): Promise<CvLink> {
+  void candidateId;
+  // Use ?mock=expired-link to see the expired state after a few seconds.
+  const expiresInSeconds = getMockScenario() === "expired-link" ? 3 : 60 * 60;
+  return simulateLatency({ url: "/mock-cv.html", expiresInSeconds }, 400);
 }

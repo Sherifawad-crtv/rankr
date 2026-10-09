@@ -229,6 +229,12 @@ export interface ProcessingBatch {
   etaSeconds: number | null;
 }
 
+/** A short-lived, signed link to the original CV file. Never a public URL. */
+export interface CvLink {
+  url: string;
+  expiresInSeconds: number;
+}
+
 /** Candidate-facing view: stage only, never scores or rankings. TODO(spec): candidate-facing stage labels. */
 export interface Application {
   id: string;
