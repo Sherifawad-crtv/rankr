@@ -297,24 +297,31 @@ export interface WorkspaceInput {
   plan: PlanSelection;
 }
 
-export interface DashboardCandidate {
-  id: string;
+export interface DashboardJob extends Job {
+  shortlistedCount: number;
+}
+
+/** A strong candidate worth a look first, across the recruiter's open jobs. */
+export interface TopMatch {
+  candidateId: string;
   jobId: string;
   jobTitle: string;
   fullName: string;
-  stage: CandidateStage;
+  /** Match % at the job's own weights, already adjusted for parse confidence. */
+  matchPercent: number;
   lowConfidence: boolean;
 }
 
 export interface DashboardSummary {
   plan: Plan;
-  jobs: Job[];
-  /** Most recently added first. */
-  recentCandidates: DashboardCandidate[];
+  jobs: DashboardJob[];
+  /** Most recent first. */
+  recentRuns: ScreeningRun[];
+  topMatches: TopMatch[];
   totalCandidates: number;
+  shortlistedCount: number;
   /** Low-confidence candidates a person should check by hand. */
   needsReviewCount: number;
-  filteredOutCount: number;
 }
 
 /** Per-organisation look for the white-label candidate portal. */

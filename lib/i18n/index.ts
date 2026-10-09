@@ -43,3 +43,11 @@ export function localize(text: LocalizedText, locale: Locale): string {
 export function formatNumber(locale: Locale, value: number): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en").format(value);
 }
+
+/** Date and time such as "2 Jan 2026, 9:00 AM", in the chosen language. */
+export function formatDateTime(locale: Locale, iso: string): string {
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(iso));
+}

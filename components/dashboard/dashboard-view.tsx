@@ -3,23 +3,26 @@
 import Link from "next/link";
 import { useCallback } from "react";
 import { PageHeader } from "@/components/shell/page-header";
-import { stagger } from "@/components/ui/cn";
 import {
   AnimatedNumber,
   Badge,
-  ConfidenceIndicator,
   Card,
-  EmptyPanel,
   ErrorPanel,
   Grid,
   Icon,
   LoadingPanel,
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
+import { cn, stagger } from "@/components/ui/cn";
 import { getDashboard } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
+import { useLocale } from "@/lib/i18n/locale-context";
 import { useSession } from "@/lib/session";
 import type { DashboardSummary } from "@/types";
+import { OnboardingChecklist } from "./onboarding-checklist";
+import { RecentRunsCard } from "./recent-runs-card";
+import { RunningBanner } from "./running-banner";
+import { TopMatches } from "./top-matches";
 
 function Stat({
   label,
@@ -48,23 +51,24 @@ function Stat({
 }
 
 function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
+  const { t, tn } = useLocale();
   const capacity = plan.cvCapacity;
   return (
     <Card className="animate-stagger col-span-4 flex flex-col gap-3 lg:col-span-12" style={stagger(4)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-text-primary">CV capacity this cycle</h2>
+        <h2 className="text-lg font-semibold text-text-primary">{t("upload.capacity.title")}</h2>
         {/* TODO(spec): Solo capacity is OPEN */}
         <Badge tone="neutral">
           {capacity === null
-            ? `${plan.cvUsed} used · capacity to be confirmed`
-            : `${plan.cvUsed} of ${capacity} used`}
+            ? t("upload.capacity.unknown", { used: plan.cvUsed })
+            : t("upload.capacity.used", { used: plan.cvUsed, capacity })}
         </Badge>
       </div>
       {capacity !== null && (
         <>
           <div
             role="progressbar"
-            aria-label="CV capacity used"
+            aria-label={t("upload.capacity.aria")}
             aria-valuemin={0}
             aria-valuemax={capacity}
             aria-valuenow={plan.cvUsed}
@@ -76,8 +80,10 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
             />
           </div>
           <p className="text-sm text-text-secondary">
-            {Math.max(0, capacity - plan.cvUsed)} CVs left
-            {plan.mode === "enterprise" ? ", shared across your team" : ""}.
+            {tn(
+              plan.mode === "enterprise" ? "dashboard.capacity.leftShared" : "dashboard.capacity.left",
+              Math.max(0, capacity - plan.cvUsed),
+            )}
           </p>
         </>
       )}
@@ -85,104 +91,115 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
   );
 }
 
+function JobsCard({ jobs, className }: { jobs: DashboardSummary["jobs"]; className: string }) {
+  const { t, tn } = useLocale();
+  return (
+    <Card className={cn("animate-stagger flex flex-col gap-4", className)} style={stagger(5)}>
+      <h2 className="text-lg font-semibold text-text-primary">{t("dashboard.jobs.title")}</h2>
+      <ul className="flex flex-col">
+        {jobs.map((job) => (
+          <li
+            key={job.id}
+            className="flex flex-wrap items-center justify-between gap-3 border-t border-border-default py-3 first:border-t-0 first:pt-0"
+          >
+            <div className="min-w-0">
+              <p className="truncate text-base font-semibold text-text-primary">{job.title}</p>
+              <p className="text-sm text-text-secondary">
+                {job.location} · {tn("jobs.candidates", job.candidateCount)} ·{" "}
+                {t("jobs.shortlisted", { count: job.shortlistedCount })}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link href={`/jobs/${job.id}/upload`} className={buttonClass("secondary", "sm")}>
+                <Icon name="upload" size={16} /> {t("dashboard.jobs.upload")}
+              </Link>
+              <Link href={`/jobs/${job.id}/candidates`} className={buttonClass("ghost", "sm")}>
+                {t("jobs.ranked")}
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 export function DashboardView() {
   const { user } = useSession();
+  const { t } = useLocale();
   const load = useCallback(() => getDashboard(user.planMode), [user.planMode]);
   const { state, retry } = useAsync(load);
-  const firstName = user.name.split(" ")[0];
 
-  if (state.status === "loading") return <LoadingPanel label="Loading your dashboard…" />;
-  if (state.status === "error") {
-    return <ErrorPanel message="We couldn't load your dashboard." onRetry={retry} />;
-  }
+  if (state.status === "loading") return <LoadingPanel label={t("dashboard.loading")} />;
+  if (state.status === "error") return <ErrorPanel message={t("dashboard.error")} onRetry={retry} />;
 
   const summary = state.data;
   const openJobs = summary.jobs.filter((job) => job.status === "open");
+  const firstJobId = summary.jobs[0]?.id ?? null;
+  const hasJobs = summary.jobs.length > 0;
 
   return (
-    <>
-      <PageHeader title={`Welcome back, ${firstName}`} description="Here's where your hiring stands." />
-
-      {summary.jobs.length === 0 ? (
-        <EmptyPanel
-          title="No jobs yet"
-          description="Create a job, then upload CVs to see them ranked."
-          action={{ href: "/jobs", label: "Go to jobs" }}
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PageHeader
+          title={t("dashboard.welcome", { name: user.name.split(" ")[0] })}
+          description={t("dashboard.subtitle")}
         />
-      ) : (
-        <Grid>
-          <Stat label="Open jobs" value={openJobs.length} hint="Accepting candidates" index={0} />
-          <Stat label="Candidates" value={summary.totalCandidates} hint="Across all jobs" index={1} />
-          <Stat
-            label="Needs a closer look"
-            value={summary.needsReviewCount}
-            hint="Low-confidence CVs to check by hand"
-            index={2}
-          />
-          <Stat
-            label="Filtered out"
-            value={summary.filteredOutCount}
-            hint="Didn't meet a required filter"
-            index={3}
-          />
+        <div className="flex flex-wrap gap-2">
+          <Link href="/jobs" className={buttonClass("secondary", "md")}>
+            <Icon name="upload" size={18} /> {t("dashboard.uploadCvs")}
+          </Link>
+          <Link href="/jobs/new" className={buttonClass("primary", "md")}>
+            <Icon name="plus" variant="bold" size={18} /> {t("job.new")}
+          </Link>
+        </div>
+      </div>
 
-          <CapacityCard plan={summary.plan} />
+      <RunningBanner runs={summary.recentRuns} />
 
-          <Card className="animate-stagger col-span-4 flex flex-col gap-4 lg:col-span-7" style={stagger(5)}>
-            <h2 className="text-lg font-semibold text-text-primary">Your jobs</h2>
-            <ul className="flex flex-col">
-              {summary.jobs.map((job) => (
-                <li
-                  key={job.id}
-                  className="flex flex-wrap items-center justify-between gap-3 border-t border-border-default py-3 first:border-t-0 first:pt-0"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-base font-medium text-text-primary">{job.title}</p>
-                    <p className="text-sm text-text-secondary">
-                      {job.location} · {job.candidateCount} candidates
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Link href={`/jobs/${job.id}/upload`} className={buttonClass("secondary", "sm")}>
-                      <Icon name="upload" size={16} /> Upload
-                    </Link>
-                    <Link href={`/jobs/${job.id}/candidates`} className={buttonClass("ghost", "sm")}>
-                      Ranked list
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Card>
+      <OnboardingChecklist
+        hasJob={hasJobs}
+        hasRun={summary.recentRuns.length > 0}
+        hasShortlist={summary.shortlistedCount > 0}
+        firstJobId={firstJobId}
+      />
 
-          <Card className="animate-stagger col-span-4 flex flex-col gap-4 lg:col-span-5" style={stagger(6)}>
-            <h2 className="text-lg font-semibold text-text-primary">Recently added candidates</h2>
-            {summary.recentCandidates.length === 0 ? (
-              <p className="text-sm text-text-secondary">
-                No candidates yet. Upload a batch of CVs to get started.
-              </p>
-            ) : (
-              <ul className="flex flex-col">
-                {summary.recentCandidates.map((candidate) => (
-                  <li
-                    key={candidate.id}
-                    className="flex flex-wrap items-center justify-between gap-2 border-t border-border-default py-3 first:border-t-0 first:pt-0"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-base text-text-primary">{candidate.fullName}</p>
-                      <p className="truncate text-sm text-text-secondary">{candidate.jobTitle}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {candidate.lowConfidence && <ConfidenceIndicator level="low" />}
-                      <Badge>{candidate.stage}</Badge>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        </Grid>
+      {hasJobs && (
+        <>
+          <TopMatches matches={summary.topMatches} />
+
+          <Grid>
+            <Stat
+              label={t("dashboard.stat.openJobs")}
+              value={openJobs.length}
+              hint={t("dashboard.stat.openJobsHint")}
+              index={0}
+            />
+            <Stat
+              label={t("dashboard.stat.candidates")}
+              value={summary.totalCandidates}
+              hint={t("dashboard.stat.candidatesHint")}
+              index={1}
+            />
+            <Stat
+              label={t("dashboard.stat.shortlisted")}
+              value={summary.shortlistedCount}
+              hint={t("dashboard.stat.shortlistedHint")}
+              index={2}
+            />
+            <Stat
+              label={t("dashboard.stat.review")}
+              value={summary.needsReviewCount}
+              hint={t("dashboard.stat.reviewHint")}
+              index={3}
+            />
+
+            <CapacityCard plan={summary.plan} />
+            <JobsCard jobs={summary.jobs} className="col-span-4 lg:col-span-7" />
+            <RecentRunsCard runs={summary.recentRuns} className="col-span-4 lg:col-span-5" />
+          </Grid>
+        </>
       )}
-    </>
+    </div>
   );
 }

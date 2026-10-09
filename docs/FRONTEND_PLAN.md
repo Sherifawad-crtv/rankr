@@ -265,7 +265,7 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 
 ## 9. Phased roadmap
 
-**Status:** Phase 1 (contract and foundations) is done. See the checklist under Phase 1 below.
+**Status:** Phase 1 (contract and foundations) and Phase 2 (the hero loop) are done. Next is Phase 3 (accounts).
 
 Sizes are relative: S (about a day), M (a few days), L (a week or more).
 
@@ -288,7 +288,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 4. ~~Ranked list v2: match %, chips, rationale, filters, bulk actions (L)~~ **done**
 5. ~~Candidate detail with CV viewer and Shortlist/Reject/Hire (L)~~ **done** (CV opens through a private expiring link; there is no embedded viewer)
 6. ~~CSV export with Excel-safe Arabic (S)~~ **done**
-7. Dashboard rework and onboarding checklist (M)
+7. ~~Dashboard rework and onboarding checklist (M)~~ **done**
 
 **Phase 3, accounts:** sign-in, Google, forgot password, realign entry funnel, team and roles, settings, data-deletion flow, billing. *L*
 
