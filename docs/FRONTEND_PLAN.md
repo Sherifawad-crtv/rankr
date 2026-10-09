@@ -285,7 +285,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 1. ~~Job creation wizard with skill picker (L)~~ **done** (create and edit, at `/jobs/new` and `/jobs/[id]/edit`)
 2. ~~Upload fixes: cap, rate limit, duplicates, progress (M)~~ **done**
 3. ~~Processing fixes: retry, OCR and confidence flags (M)~~ **done**
-4. Ranked list v2: match %, chips, rationale, filters, bulk actions (L)
+4. ~~Ranked list v2: match %, chips, rationale, filters, bulk actions (L)~~ **done**
 5. Candidate detail with CV viewer and Shortlist/Reject/Hire (L)
 6. CSV export with Excel-safe Arabic (S)
 7. Dashboard rework and onboarding checklist (M)

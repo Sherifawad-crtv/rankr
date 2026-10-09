@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { useFlip } from "@/lib/hooks/use-flip";
 import { Checkbox } from "./checkbox";
-import { cn } from "./cn";
+import { cn, stagger } from "./cn";
 import { Icon } from "./icons";
 import { Table, Td, Th } from "./table";
 
@@ -26,7 +27,7 @@ interface DataTableProps<T> {
   /** Provide both to turn on row selection. */
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 }
 
 type Direction = "asc" | "desc";
@@ -58,6 +59,8 @@ export function DataTable<T>({
     const factor = sort.direction === "asc" ? 1 : -1;
     return [...rows].sort((a, b) => factor * compare(getValue(a), getValue(b)));
   }, [rows, columns, sort]);
+
+  const rowRef = useFlip(sorted.map(getRowId));
 
   const allSelected = rows.length > 0 && rows.every((row) => selected.has(getRowId(row)));
   const someSelected = !allSelected && rows.some((row) => selected.has(getRowId(row)));
@@ -134,12 +137,17 @@ export function DataTable<T>({
             </Td>
           </tr>
         )}
-        {sorted.map((row) => {
+        {sorted.map((row, index) => {
           const id = getRowId(row);
           return (
             <tr
               key={id}
-              className={cn("transition-colors hover:bg-subtle/60", selected.has(id) && "bg-primary/5")}
+              ref={rowRef(id)}
+              style={stagger(index)}
+              className={cn(
+                "animate-stagger transition-colors hover:bg-subtle/60",
+                selected.has(id) && "bg-primary/5",
+              )}
             >
               {selectable && (
                 <Td>

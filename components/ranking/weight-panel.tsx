@@ -10,16 +10,18 @@ interface WeightPanelProps {
   weights: ScoreWeights;
   onChange: (dimension: ScoreDimension, value: number) => void;
   onReset: () => void;
+  /** Hide the heading when the panel sits under its own heading (e.g. a disclosure). */
+  showTitle?: boolean;
 }
 
-export function WeightPanel({ weights, onChange, onReset }: WeightPanelProps) {
+export function WeightPanel({ weights, onChange, onReset, showTitle = true }: WeightPanelProps) {
   const base = useId();
   const { t } = useLocale();
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">{t("weights.title")}</h2>
+          {showTitle && <h2 className="text-lg font-semibold text-text-primary">{t("weights.title")}</h2>}
           <p className="text-sm text-text-secondary">
             {t("weights.hint", { total: weightsTotal(weights) })}
           </p>
