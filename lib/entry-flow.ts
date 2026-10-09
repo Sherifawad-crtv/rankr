@@ -1,3 +1,4 @@
+import { isValidEmail } from "@/lib/auth";
 import { ENTERPRISE_CV_TIERS, type EnterpriseCvTier, type PlanSelection } from "@/types";
 
 type RawParams = Record<string, string | string[] | undefined>;
@@ -28,5 +29,5 @@ export function planQuery(selection: PlanSelection): string {
 
 export function parseEmail(params: RawParams): string | null {
   const email = first(params.email);
-  return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+  return email && isValidEmail(email) ? email : null;
 }

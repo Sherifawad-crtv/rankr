@@ -290,7 +290,12 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 6. ~~CSV export with Excel-safe Arabic (S)~~ **done**
 7. ~~Dashboard rework and onboarding checklist (M)~~ **done**
 
-**Phase 3, accounts:** sign-in, Google, forgot password, realign entry funnel, team and roles, settings, data-deletion flow, billing. *L*
+**Phase 3, accounts:** *L*
+- [x] Sign-in (email and Google), forgot password, reset password, sign-out, persistent mock session, optional route guard.
+- [ ] Re-align the entry funnel with the PRD (sign-up, verify email, checkout, workspace setup, invite team, welcome).
+- [ ] Settings: profile, company, notifications, team and roles.
+- [ ] Delete-my-data flow.
+- [ ] Billing.
 
 **Phase 4, admin panel (P1):** companies, users, moderation, reports, block list, pilots. *L*
 

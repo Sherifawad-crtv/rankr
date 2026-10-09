@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button, Card, Checkbox, Input } from "@/components/ui";
 import { EmailTakenError, createAccount } from "@/lib/api";
+import { MIN_PASSWORD_LENGTH, isValidEmail } from "@/lib/auth";
 import { planQuery } from "@/lib/entry-flow";
 import type { PlanSelection } from "@/types";
 import { PlanSummary } from "./plan-summary";
 
-// TODO(spec): password rules and terms/privacy acceptance are not specified.
-const MIN_PASSWORD_LENGTH = 8;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// TODO(spec): terms/privacy acceptance is not specified.
 
 interface Errors {
   fullName?: string;
@@ -28,7 +27,7 @@ function validate(values: {
 }): Errors {
   const errors: Errors = {};
   if (!values.fullName.trim()) errors.fullName = "Enter your full name.";
-  if (!EMAIL_PATTERN.test(values.email)) errors.email = "Enter a valid email address.";
+  if (!isValidEmail(values.email)) errors.email = "Enter a valid email address.";
   if (values.password.length < MIN_PASSWORD_LENGTH) {
     errors.password = `Use at least ${MIN_PASSWORD_LENGTH} characters.`;
   }

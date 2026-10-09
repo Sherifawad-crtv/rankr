@@ -8,6 +8,7 @@ export { Dialog } from "./dialog";
 export { Grid } from "./grid";
 export { Icon, type IconName } from "./icons";
 export { Input, Select, Textarea } from "./input";
+export { PasswordInput } from "./password-input";
 export { Segmented } from "./segmented";
 export { EmptyPanel, ErrorPanel, LoadingPanel } from "./state-panels";
 export { Skeleton } from "./skeleton";

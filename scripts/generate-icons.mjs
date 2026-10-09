@@ -52,6 +52,9 @@ const ICONS = {
   building: "buildings-2",
   bolt: "bolt",
   wand: "magic-wand-2",
+  global: "global",
+  eye: "eye",
+  "eye-closed": "eye-closed",
 };
 
 function body(name) {

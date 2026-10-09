@@ -20,3 +20,15 @@ Icons are from the [Solar Icon Set](https://www.figma.com/community/file/1166831
 ## Entry flow
 
 The sign-up funnel (plans, create account, verify email, checkout, workspace setup) is hidden until it is ready. Set `SHOW_ENTRY_FLOW=true` to expose it.
+
+## Environment flags
+
+| Variable | Effect |
+|---|---|
+| `SHOW_ENTRY_FLOW=true` | Shows the sign-up funnel (plans, create account, checkout, workspace setup). |
+| `NEXT_PUBLIC_REQUIRE_SIGN_IN=true` | Sends signed-out visitors to `/sign-in`. Off by default so the app can be reviewed without signing in. |
+| `NEXT_PUBLIC_ENABLE_ARABIC=true` | Shows the Arabic language option in production builds (always shown in dev). |
+
+## Mock sign-in
+
+Any email signs in. `wrong@example.com`, `unverified@example.com` and `locked@example.com` trigger the error states; `staff@rankr.example` and `admin@...` sign in as Rankr staff and company admin. Replace with the real auth provider at the `TODO(backend)` calls in `lib/api/auth.ts`.
