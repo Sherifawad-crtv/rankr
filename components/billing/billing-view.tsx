@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { PageHeader } from "@/components/shell/page-header";
 import {
   Badge,
   Button,
@@ -184,8 +183,7 @@ export function BillingView() {
   const { state, retry } = useAsync(load);
 
   return (
-    <div className="flex max-w-2xl flex-col gap-6">
-      <PageHeader title={t("billing.title")} description={t("billing.subtitle")} />
+    <>
       {user.role === "recruiter" ? (
         <EmptyPanel icon="lock" title={t("billing.adminOnly")} />
       ) : state.status === "loading" ? (
@@ -195,6 +193,6 @@ export function BillingView() {
       ) : (
         <BillingContent overview={state.data} onChanged={retry} />
       )}
-    </div>
+    </>
   );
 }

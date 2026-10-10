@@ -68,7 +68,7 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
       </div>
       <CapacityMeter plan={plan} />
       {user.role !== "recruiter" && (
-        <Link href="/billing" className="self-start text-base font-semibold text-primary hover:underline">
+        <Link href="/settings/billing" className="self-start text-base font-semibold text-primary hover:underline">
           {t("billing.manage")}
         </Link>
       )}

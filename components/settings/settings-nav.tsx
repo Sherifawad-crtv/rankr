@@ -8,19 +8,22 @@ import type { MessageKey } from "@/lib/i18n";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { useSession } from "@/lib/session";
 
-const ITEMS: Array<{ href: string; labelKey: MessageKey; icon: IconName; enterpriseOnly?: boolean }> = [
+const ITEMS: Array<{ href: string; labelKey: MessageKey; icon: IconName; enterpriseOnly?: boolean; adminOnly?: boolean }> = [
   { href: "/settings/profile", labelKey: "settings.nav.profile", icon: "user" },
   { href: "/settings/company", labelKey: "settings.nav.company", icon: "building" },
   { href: "/settings/team", labelKey: "settings.nav.team", icon: "users", enterpriseOnly: true },
+  { href: "/settings/billing", labelKey: "settings.nav.billing", icon: "card", adminOnly: true },
   { href: "/settings/notifications", labelKey: "settings.nav.notifications", icon: "bell" },
 ];
 
-/** Sections of Settings: a side list on large screens, a scrollable row on phones. Team is Enterprise only. */
+/** Sections of Settings: a side list on large screens, a scrollable row on phones. Team is Enterprise only; Billing is for admins. */
 export function SettingsNav() {
   const { t } = useLocale();
   const pathname = usePathname();
   const { user } = useSession();
-  const items = ITEMS.filter((item) => !(item.enterpriseOnly && user.planMode === "solo"));
+  const items = ITEMS.filter(
+    (item) => !(item.enterpriseOnly && user.planMode === "solo") && !(item.adminOnly && user.role === "recruiter"),
+  );
 
   return (
     <nav aria-label={t("settings.nav.aria")} className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:overflow-visible lg:px-0">
