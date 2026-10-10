@@ -56,6 +56,8 @@ export const mockPlans: Record<"solo" | "enterprise", Plan> = {
 export const mockJobs: Job[] = [
   {
     id: "job-1",
+    slug: "senior-frontend-developer",
+    acceptingApplications: true,
     title: "Senior Frontend Developer",
     description: "Build and maintain the customer-facing web app.",
     location: "Cairo",
@@ -75,6 +77,8 @@ export const mockJobs: Job[] = [
   },
   {
     id: "job-2",
+    slug: "accountant",
+    acceptingApplications: false,
     title: "Accountant",
     description: "Own monthly close and financial reporting.",
     location: "Alexandria",
@@ -98,6 +102,8 @@ export const mockCandidates: Candidate[] = [
     id: "cand-1",
     jobId: "job-1",
     runId: "run-1",
+    source: "upload",
+    addedAt: "2026-01-02T09:00:00.000Z",
     cv: {
       fullName: "Ahmed Hassan",
       fullNameAr: "أحمد حسن",
@@ -131,7 +137,9 @@ export const mockCandidates: Candidate[] = [
   {
     id: "cand-2",
     jobId: "job-1",
-    runId: "run-1",
+    runId: null,
+    source: "application",
+    addedAt: "2026-01-03T14:00:00.000Z",
     cv: {
       fullName: "Sara Ali",
       fullNameAr: "سارة علي",
@@ -162,6 +170,8 @@ export const mockCandidates: Candidate[] = [
     id: "cand-3",
     jobId: "job-1",
     runId: "run-1",
+    source: "upload",
+    addedAt: "2026-01-02T09:00:00.000Z",
     cv: {
       fullName: "Omar Khaled",
       fullNameAr: null,
@@ -189,6 +199,8 @@ export const mockCandidates: Candidate[] = [
     id: "cand-4",
     jobId: "job-2",
     runId: "run-2",
+    source: "upload",
+    addedAt: "2026-01-06T10:30:00.000Z",
     cv: {
       fullName: "Mona Fathy",
       fullNameAr: "منى فتحي",
@@ -220,6 +232,8 @@ export const mockCandidates: Candidate[] = [
     id: "cand-5",
     jobId: "job-2",
     runId: "run-2",
+    source: "upload",
+    addedAt: "2026-01-06T10:30:00.000Z",
     cv: {
       fullName: "Youssef Nabil",
       fullNameAr: null,
@@ -249,6 +263,8 @@ export const mockCandidates: Candidate[] = [
     id: "cand-6",
     jobId: "job-2",
     runId: "run-2",
+    source: "upload",
+    addedAt: "2026-01-06T10:30:00.000Z",
     cv: {
       fullName: "Heba Mansour",
       fullNameAr: "هبة منصور",
@@ -294,8 +310,8 @@ export const mockRuns: ScreeningRun[] = [
     jobTitle: "Senior Frontend Developer",
     createdAt: "2026-01-02T09:00:00.000Z",
     status: "completed",
-    total: 3,
-    scored: 3,
+    total: 2,
+    scored: 2,
     failed: 0,
     duplicates: 0,
   },

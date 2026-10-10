@@ -17,13 +17,11 @@ import { RateLimitError, getJob, getPlan, getUploadQuota, submitCVBatch } from "
 import { track } from "@/lib/analytics";
 import { useAsync } from "@/lib/hooks/use-async";
 import { useLocale } from "@/lib/i18n/locale-context";
-import { MAX_CVS_PER_RUN } from "@/lib/limits";
+import { ACCEPTED_CV_EXTENSIONS, MAX_CVS_PER_RUN } from "@/lib/limits";
 import { useSession } from "@/lib/session";
 import type { UploadProgress } from "@/types";
 import { Dropzone } from "./dropzone";
 
-// TODO(spec): accepted formats and size limit are not specified.
-const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx"];
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_NOTICES = 5;
 
@@ -78,7 +76,7 @@ export function UploadView({ jobId }: { jobId: string }) {
 
     for (const file of incoming) {
       const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-      if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+      if (!ACCEPTED_CV_EXTENSIONS.includes(extension)) {
         messages.push(t("upload.err.type", { name: file.name }));
       } else if (file.size > MAX_FILE_BYTES) {
         messages.push(t("upload.err.size", { name: file.name }));
@@ -179,7 +177,7 @@ export function UploadView({ jobId }: { jobId: string }) {
         </Card>
       ) : (
         <>
-          <Dropzone accept={ACCEPTED_EXTENSIONS.join(",")} onFiles={addFiles} />
+          <Dropzone accept={ACCEPTED_CV_EXTENSIONS.join(",")} onFiles={addFiles} />
 
           {notices.length > 0 && (
             <ul role="alert" className="flex flex-col gap-1 text-sm text-danger">

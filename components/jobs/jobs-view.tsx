@@ -38,7 +38,7 @@ export function JobsView() {
           ) : (
             <ul className="grid gap-4 lg:grid-cols-2">
               {state.data[0].map((job) => (
-                <li key={job.id} >
+                <li key={job.id}>
                   <Card className="flex flex-col gap-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -47,9 +47,14 @@ export function JobsView() {
                           {job.location} · {tn("jobs.candidates", job.candidateCount)}
                         </p>
                       </div>
-                      <Badge tone={job.status === "open" ? "match" : "neutral"}>
-                        {t(`jobstatus.${job.status}`)}
-                      </Badge>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {job.status === "open" && job.acceptingApplications && (
+                          <Badge tone="primary">{t("jobs.accepting")}</Badge>
+                        )}
+                        <Badge tone={job.status === "open" ? "match" : "neutral"}>
+                          {t(`jobstatus.${job.status}`)}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Link href={`/jobs/${job.id}/upload`} className={buttonClass("primary", "md")}>
@@ -57,6 +62,9 @@ export function JobsView() {
                       </Link>
                       <Link href={`/jobs/${job.id}/candidates`} className={buttonClass("secondary", "md")}>
                         {t("jobs.ranked")}
+                      </Link>
+                      <Link href={`/jobs/${job.id}/applications`} className={buttonClass("ghost", "md")}>
+                        <Icon name="users" size={18} /> {t("jobs.collect")}
                       </Link>
                       <Link href={`/jobs/${job.id}/edit`} className={buttonClass("ghost", "md")}>
                         <Icon name="edit" size={18} /> {t("common.edit")}

@@ -1,5 +1,6 @@
 import { mockJobs } from "@/lib/mocks/data";
 import { simulateLatency, simulateList } from "@/lib/mocks/latency";
+import { slugify } from "@/lib/careers";
 import type { Job, JobInput } from "@/types";
 
 // TODO(backend): wire to real endpoint
@@ -25,6 +26,8 @@ export async function createJob(input: JobInput): Promise<Job> {
   const job: Job = {
     ...input,
     id: `job-${mockJobs.length + 1}`,
+    slug: slugify(input.title),
+    acceptingApplications: false,
     status: "open",
     candidateCount: 0,
     createdAt: new Date().toISOString(),

@@ -99,6 +99,16 @@ function ApplicantsList({ applicants }: { applicants: Applicant[] }) {
       ),
     },
     {
+      id: "source",
+      header: t("applicants.col.source"),
+      sortValue: (row) => row.candidate.source,
+      cell: (row) => (
+        <Badge tone={row.candidate.source === "application" ? "primary" : "neutral"}>
+          {t(`source.${row.candidate.source}`)}
+        </Badge>
+      ),
+    },
+    {
       id: "match",
       header: t("applicants.col.match"),
       sortValue: (row) => row.matchPercent,

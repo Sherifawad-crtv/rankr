@@ -110,12 +110,13 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
               /jobs/[id]/runs/[runId]    live processing                 P0   (built as /processing)
               /jobs/[id]/candidates      ranked list                     P0   (built, needs v2)
               /jobs/[id]/candidates/[c]  candidate detail                P0
+              /jobs/[id]/applications    open a job for applications     P0
               /applicants                all candidates across jobs, filterable   P0
               /analytics                 funnel and usage                P2 (v1.1)
               /settings/*  (incl. billing)                                      P0 / P1
 (admin)       /admin/companies  /users  /moderation  /blocklist  /pilots P1
               /admin/bias-audit                                          P2 (v1.1)
-(candidate)   ON HOLD, see conflict #2
+(candidate)   /careers/[org]  /[job]  /[job]/apply  /[job]/submitted   white-label, public, no sign-in
 ```
 
 Navigation: sidebar (Dashboard, Jobs, Applicants, Settings; Billing lives under Settings). Analytics stays hidden until v1.1. Admin has its own shell.
@@ -325,3 +326,11 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 ## 11. Back-end hand-off notes (not front-end work)
 
 These are called out by the PRD and are **not** built in this repo: Claude API parsing, Tesseract OCR, skill and title normalization logic, Jaccard scoring and penalties, semantic similarity, rationale generation, SHA-256 hashing, queues (`cv_processing_queue`, `rescore_queue`), Supabase auth, RLS, private storage and signed URLs, rate limiting enforcement, Resend sending, PostHog, Paymob and Stripe, webhooks and REST API, bias audit job, feedback flywheel. The front-end only needs the typed contract in `types/` and the functions in `lib/api/`.
+
+
+## Two core flows (decided)
+
+1. **Upload CVs (primary):** pick a job, drop a batch, consent, watch it process, shortlist from the ranked list.
+2. **Collect applications (secondary):** open a job to a public, white-label apply page, share the link, applicants land in the same ranked list marked "Applied".
+
+Both start from one question, "which job?", through the same picker (dashboard buttons) or the job's own card (Jobs page). Creating a job from the picker returns you to the flow you started. Applicants see a confirmation only: never scores, rankings or stage. Still open: whether applications count against CV capacity, consent wording, and whether applicants get a status page (magic link).

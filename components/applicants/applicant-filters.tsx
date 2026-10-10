@@ -53,6 +53,17 @@ export function ApplicantFilterBar({ filters, onChange, jobs, stageCounts }: App
             ))}
           </Select>
         </div>
+        <div className="w-full sm:w-40">
+          <Select
+            label={t("applicants.filter.source")}
+            value={filters.source}
+            onChange={(event) => set({ source: event.target.value as ApplicantFilters["source"] })}
+          >
+            <option value="all">{t("applicants.filter.source.all")}</option>
+            <option value="upload">{t("source.upload")}</option>
+            <option value="application">{t("source.application")}</option>
+          </Select>
+        </div>
         <div className="w-full sm:w-44">
           <Select
             label={t("applicants.filter.group")}

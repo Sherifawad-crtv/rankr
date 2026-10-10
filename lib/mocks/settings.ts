@@ -13,6 +13,7 @@ export const mockSettings: {
 } = {
   profile: { fullName: "Mock Recruiter", jobTitle: "HR Manager", email: "recruiter@example.com" },
   company: {
+    slug: "acme-talent",
     name: "Acme Talent",
     size: "51-200",
     branding: { name: "Acme Talent", logoUrl: null, primaryColor: "#2563EB" },

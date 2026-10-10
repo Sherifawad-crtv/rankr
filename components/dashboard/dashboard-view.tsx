@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import {
   Badge,
+  Button,
   Card,
   ErrorPanel,
   Grid,
@@ -18,6 +19,7 @@ import { useAsync } from "@/lib/hooks/use-async";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { useSession } from "@/lib/session";
 import type { DashboardSummary } from "@/types";
+import { JobPickerDialog, type JobPurpose } from "@/components/jobs/job-picker-dialog";
 import { CapacityMeter } from "@/components/billing/capacity-meter";
 import { OnboardingChecklist } from "./onboarding-checklist";
 import { RecentRunsCard } from "./recent-runs-card";
@@ -107,6 +109,7 @@ function JobsCard({ jobs, className }: { jobs: DashboardSummary["jobs"]; classNa
 export function DashboardView() {
   const { user } = useSession();
   const { t } = useLocale();
+  const [picker, setPicker] = useState<JobPurpose | null>(null);
   const load = useCallback(() => getDashboard(user.planMode), [user.planMode]);
   const { state, retry } = useAsync(load);
 
@@ -126,12 +129,12 @@ export function DashboardView() {
           description={t("dashboard.subtitle")}
         />
         <div className="flex flex-wrap gap-2">
-          <Link href="/jobs/new" className={buttonClass("secondary", "md")}>
-            <Icon name="plus" size={18} /> {t("job.new")}
-          </Link>
-          <Link href="/jobs" className={buttonClass("primary", "md")}>
+          <Button variant="secondary" onClick={() => setPicker("collect")}>
+            <Icon name="users" size={18} /> {t("jobs.collect")}
+          </Button>
+          <Button onClick={() => setPicker("screen")}>
             <Icon name="upload" size={18} /> {t("dashboard.uploadCvs")}
-          </Link>
+          </Button>
         </div>
       </div>
 
@@ -176,6 +179,8 @@ export function DashboardView() {
           </Grid>
         </>
       )}
+
+      <JobPickerDialog purpose={picker ?? "screen"} open={picker !== null} onClose={() => setPicker(null)} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SkillChip } from "@/components/ui";
+import { Badge, SkillChip } from "@/components/ui";
 import { useLocale } from "@/lib/i18n/locale-context";
 import type { Candidate } from "@/types";
 
@@ -23,6 +23,7 @@ export function CandidateCell({ candidate, jobId }: { candidate: Candidate; jobI
         >
           {candidate.cv.fullName}
         </Link>
+        {candidate.source === "application" && <Badge tone="primary">{t("source.application")}</Badge>}
         {candidate.cv.fullNameAr && (
           <span lang="ar" dir="rtl" className="text-sm text-text-secondary">
             {candidate.cv.fullNameAr}

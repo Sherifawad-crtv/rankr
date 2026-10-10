@@ -1,4 +1,4 @@
-import type { Applicant, CandidateStage } from "@/types";
+import type { Applicant, CandidateSource, CandidateStage } from "@/types";
 
 export type StageFilter = "all" | CandidateStage;
 /** Candidates who passed the job's hard filters, or the ones a filter knocked out. */
@@ -9,6 +9,8 @@ export interface ApplicantFilters {
   /** A job id, or "all". */
   jobId: string;
   stage: StageFilter;
+  /** How they arrived: uploaded by a recruiter, or applied through the public page. */
+  source: "all" | CandidateSource;
   group: GroupFilter;
   lowConfidenceOnly: boolean;
 }
@@ -17,6 +19,7 @@ export const NO_FILTERS: ApplicantFilters = {
   query: "",
   jobId: "all",
   stage: "all",
+  source: "all",
   group: "all",
   lowConfidenceOnly: false,
 };
@@ -40,6 +43,7 @@ export function filterApplicantsExceptStage(rows: Applicant[], filters: Applican
     (row) =>
       matchesQuery(row, filters.query) &&
       (filters.jobId === "all" || row.jobId === filters.jobId) &&
+      (filters.source === "all" || row.candidate.source === filters.source) &&
       (filters.group === "all" || (filters.group === "filteredOut") === (row.candidate.filteredOut !== null)) &&
       (!filters.lowConfidenceOnly || row.candidate.lowConfidence),
   );

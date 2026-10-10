@@ -96,6 +96,10 @@ export type HardFilter =
 
 export interface Job {
   id: string;
+  /** Last part of the public apply link, unique within the company. */
+  slug: string;
+  /** The job has a public apply page that is taking applications. */
+  acceptingApplications: boolean;
   title: string;
   description: string;
   location: string;
@@ -147,10 +151,17 @@ export interface ParsedCV {
 /** Pipeline stage a recruiter moves a candidate through. Interview scheduling is out of scope. */
 export type CandidateStage = "new" | "shortlisted" | "rejected" | "hired";
 
+/** How a candidate reached the list: a recruiter uploaded their CV, or they applied themselves. */
+export type CandidateSource = "upload" | "application";
+
 export interface Candidate {
   id: string;
   jobId: string;
-  runId: string;
+  /** The screening run the CV came through, or null for someone who applied through the public page. */
+  runId: string | null;
+  source: CandidateSource;
+  /** When the CV was uploaded or the application was received. */
+  addedAt: string;
   cv: ParsedCV;
   breakdown: ScoreBreakdown;
   /** Why this candidate scored as they did, in one or two plain sentences. */
@@ -347,6 +358,8 @@ export interface UserProfile {
 }
 
 export interface CompanySettings {
+  /** Last part of the careers page link, e.g. /careers/acme-talent. */
+  slug: string;
   name: string;
   size: CompanySize;
   /** How the company looks on its candidate-facing pages. */
@@ -407,4 +420,35 @@ export interface Applicant {
   matchPercent: number;
   /** When the CV was screened. */
   addedAt: string;
+}
+
+/** The public face of a company on its careers page. */
+export interface OrgPublicProfile {
+  slug: string;
+  branding: OrgBranding;
+}
+
+/** A job as an applicant sees it: no scores, filters or weights. */
+export interface PublicJob {
+  slug: string;
+  title: string;
+  description: string;
+  location: string;
+  /** Required and preferred skills, as plain names. */
+  skills: SkillRef[];
+}
+
+export interface CareersPage {
+  org: OrgPublicProfile;
+  jobs: PublicJob[];
+}
+
+/** What an applicant submits. Never gender, age, religion, marital status or a photo. */
+export interface ApplicationInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  cv: File;
+  /** The applicant explicitly agreed; the form never pre-ticks it. */
+  consent: true;
 }

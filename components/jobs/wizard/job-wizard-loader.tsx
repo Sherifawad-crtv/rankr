@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Card, ErrorPanel, LoadingPanel } from "@/components/ui";
 import { getJob, listSkills } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
@@ -12,6 +13,7 @@ import { JobWizard } from "./job-wizard";
 /** Loads the skills catalogue (and the job, when editing) and then shows the wizard. */
 export function JobWizardLoader({ jobId }: { jobId?: string }) {
   const { t } = useLocale();
+  const next = useSearchParams().get("then") === "collect" ? "collect" : "screen";
   const load = useCallback(
     () => Promise.all([listSkills(), jobId ? getJob(jobId) : Promise.resolve(null)]),
     [jobId],
@@ -33,5 +35,5 @@ export function JobWizardLoader({ jobId }: { jobId?: string }) {
     );
   }
 
-  return <JobWizard jobId={jobId} initial={job ? jobToDraft(job) : EMPTY_DRAFT} catalogue={catalogue} />;
+  return <JobWizard jobId={jobId} initial={job ? jobToDraft(job) : EMPTY_DRAFT} catalogue={catalogue} next={next} />;
 }

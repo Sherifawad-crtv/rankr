@@ -58,7 +58,12 @@ function failed(fileName: string): boolean {
   return /fail/i.test(fileName);
 }
 
-function candidateFromFile(job: Job | undefined, runId: string, id: string, fileName: string): Candidate {
+export function candidateFromFile(
+  job: Job | undefined,
+  runId: string | null,
+  id: string,
+  fileName: string,
+): Candidate {
   const seed = hash(fileName);
   const base = fileName.replace(/\.[^.]+$/, "").replace(/[-_.]+/g, " ").trim();
   const name = base.replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Unnamed candidate";
@@ -89,6 +94,8 @@ function candidateFromFile(job: Job | undefined, runId: string, id: string, file
     id,
     jobId: job?.id ?? "",
     runId,
+    source: runId === null ? "application" : "upload",
+    addedAt: new Date().toISOString(),
     cv: {
       fullName: name,
       fullNameAr: null,

@@ -20,9 +20,11 @@ interface JobWizardProps {
   jobId?: string;
   initial: JobDraft;
   catalogue: Skill[];
+  /** Where a new job goes next: upload CVs to screen, or open the job for applications. */
+  next?: "screen" | "collect";
 }
 
-export function JobWizard({ jobId, initial, catalogue }: JobWizardProps) {
+export function JobWizard({ jobId, initial, catalogue, next = "screen" }: JobWizardProps) {
   const router = useRouter();
   const toast = useToast();
   const { t } = useLocale();
@@ -94,7 +96,7 @@ export function JobWizard({ jobId, initial, catalogue }: JobWizardProps) {
         const job = await createJob(input);
         toast.show(t("job.toast.created"), "match");
         setSaved(true);
-        router.push(`/jobs/${job.id}/upload`);
+        router.push(next === "collect" ? `/jobs/${job.id}/applications` : `/jobs/${job.id}/upload`);
       }
     } catch {
       setErrors({ form: t("job.review.error") });
