@@ -110,6 +110,7 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
               /jobs/[id]/runs/[runId]    live processing                 P0   (built as /processing)
               /jobs/[id]/candidates      ranked list                     P0   (built, needs v2)
               /jobs/[id]/candidates/[c]  candidate detail                P0
+              /applicants                all candidates across jobs, filterable   P0
               /analytics                 funnel and usage                P2 (v1.1)
               /settings/*  (incl. billing)                                      P0 / P1
 (admin)       /admin/companies  /users  /moderation  /blocklist  /pilots P1
@@ -117,7 +118,7 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
 (candidate)   ON HOLD, see conflict #2
 ```
 
-Navigation: sidebar (Dashboard, Jobs, Settings; Billing lives under Settings). Analytics stays hidden until v1.1. Admin has its own shell.
+Navigation: sidebar (Dashboard, Jobs, Applicants, Settings; Billing lives under Settings). Analytics stays hidden until v1.1. Admin has its own shell.
 
 ---
 

@@ -397,3 +397,14 @@ export interface PlanChange {
 
 /** Post-run feedback. TODO(spec): confirm a thumbs up / down scale (PRD target: above 80% positive). */
 export type RunRating = "positive" | "negative";
+
+/** One row of the cross-job Applicants list. */
+export interface Applicant {
+  candidate: Candidate;
+  jobId: string;
+  jobTitle: string;
+  /** Match % at the job's own weights, already adjusted for parse confidence. */
+  matchPercent: number;
+  /** When the CV was screened. */
+  addedAt: string;
+}

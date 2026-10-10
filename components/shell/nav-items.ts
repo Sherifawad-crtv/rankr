@@ -11,5 +11,6 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { href: "/dashboard", labelKey: "nav.dashboard", icon: "home" },
   { href: "/jobs", labelKey: "nav.jobs", icon: "briefcase" },
+  { href: "/applicants", labelKey: "nav.applicants", icon: "users" },
   { href: "/settings", labelKey: "nav.settings", icon: "settings" },
 ];
