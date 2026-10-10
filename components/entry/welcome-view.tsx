@@ -31,7 +31,7 @@ export function WelcomeView({ invited }: { invited: number }) {
       </div>
       <div className="flex flex-wrap justify-center gap-2">
         <Link href="/jobs/new" className={buttonClass("primary", "lg")}>
-          <Icon name="plus" variant="bold" size={18} /> {t("welcome.createJob")}
+          <Icon name="plus" size={18} /> {t("welcome.createJob")}
         </Link>
         <Link href="/dashboard" className={buttonClass("secondary", "lg")}>
           {t("welcome.dashboard")}

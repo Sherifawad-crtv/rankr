@@ -33,7 +33,7 @@ Everything the back-end touches is reached through a **typed service layer** (`l
 - **Tailwind CSS** with a token-driven theme (CSS variables → Tailwind config). No inline styles.
 - **Deploy target: Vercel.**
 - **Fonts (locked):** Urbanist for UI text, Space Grotesk for headings, numbers and scores (self-hosted via Fontsource). Arabic pairing comes with the Arabic phase.
-- **Icons (locked):** Solar icon set (480 Design, CC BY 4.0), copied into source by `scripts/generate-icons.mjs`. Add an icon by adding a line there and re-running it.
+- **Icons (locked):** Solar icon set (480 Design, CC BY 4.0), copied into source by `scripts/generate-icons.mjs`. Add an icon by adding a line there and re-running it. Icons inside buttons and links use the default linear style; bold is only for the active nav item and for status or illustration icons (badges, empty and success states).
 - **Language:** English first, Arabic (RTL) next. Every user-facing string in new or rebuilt screens goes through `t("key")` from `useLocale()` (keys live in `lib/i18n/messages/en.ts`; Arabic falls back to English until translated). Use logical CSS properties (`ms-`, `ps-`, `text-start`, `start-`), mirror directional icons with `mirrorRtl`, and test both directions.
 - **White-label:** wrap an organisation's pages in `<BrandScope branding={...}>` to swap the primary colour at runtime. Never hardcode the brand blue; use `bg-primary`, `text-primary`, `text-primary-contrast`.
 - **Feature flags:** `lib/flags.ts`. **Analytics:** `track()` in `lib/analytics.ts` (stub).

@@ -91,7 +91,7 @@ export function RankedToolbar(props: RankedToolbarProps) {
               {tn("ranked.selected", props.selectedCount)}
             </span>
             <Button size="sm" loading={props.acting} onClick={() => props.onAct("shortlisted")}>
-              <Icon name="star" variant="bold" size={16} /> {t("ranked.action.shortlist")}
+              <Icon name="star" size={16} /> {t("ranked.action.shortlist")}
             </Button>
             <Button size="sm" variant="secondary" disabled={props.acting} onClick={() => props.onAct("rejected")}>
               {t("ranked.action.reject")}

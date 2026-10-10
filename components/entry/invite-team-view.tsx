@@ -75,7 +75,7 @@ export function InviteTeamView({ selection }: { selection: PlanSelection }) {
         {/* TODO(spec): what each role is allowed to do */}
         <p className="text-sm text-text-secondary">{t("invite.roleHelp")}</p>
         <Button type="submit" variant="secondary" className="self-start" disabled={!text.trim()}>
-          <Icon name="plus" variant="bold" size={16} /> {t("invite.add")}
+          <Icon name="plus" size={16} /> {t("invite.add")}
         </Button>
       </form>
 

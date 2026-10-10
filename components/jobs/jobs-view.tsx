@@ -20,7 +20,7 @@ export function JobsView() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageHeader title={t("jobs.title")} description={t("jobs.subtitle")} />
         <Link href="/jobs/new" className={buttonClass("primary", "md")}>
-          <Icon name="plus" variant="bold" size={18} /> {t("job.new")}
+          <Icon name="plus" size={18} /> {t("job.new")}
         </Link>
       </div>
       {state.status === "loading" && <LoadingPanel label={t("jobs.loading")} />}

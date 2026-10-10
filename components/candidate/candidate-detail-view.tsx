@@ -186,7 +186,7 @@ export function CandidateDetailView({ jobId, candidateId }: { jobId: string; can
                 disabled={acting !== null}
                 onClick={() => (action.stage === "rejected" ? setConfirmReject(true) : changeStage(action.stage))}
               >
-                {action.stage === "shortlisted" && <Icon name="star" variant="bold" size={18} />}
+                {action.stage === "shortlisted" && <Icon name="star" size={18} />}
                 {t(`detail.action.${action.labelKey}`)}
               </Button>
             ),

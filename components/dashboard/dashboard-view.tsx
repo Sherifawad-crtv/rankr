@@ -127,10 +127,10 @@ export function DashboardView() {
         />
         <div className="flex flex-wrap gap-2">
           <Link href="/jobs/new" className={buttonClass("secondary", "md")}>
-            <Icon name="plus" variant="bold" size={18} /> {t("job.new")}
+            <Icon name="plus" size={18} /> {t("job.new")}
           </Link>
           <Link href="/jobs" className={buttonClass("primary", "md")}>
-            <Icon name="upload" variant="bold" size={18} /> {t("dashboard.uploadCvs")}
+            <Icon name="upload" size={18} /> {t("dashboard.uploadCvs")}
           </Link>
         </div>
       </div>
