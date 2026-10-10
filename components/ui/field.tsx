@@ -28,4 +28,4 @@ export function Field({ label, hint, error, children }: FieldProps) {
 }
 
 export const controlClass =
-  "w-full rounded-md border border-border-default bg-surface px-3 text-base text-text-primary placeholder:text-text-disabled focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-border-focus disabled:bg-subtle disabled:text-text-disabled aria-[invalid=true]:animate-shake aria-[invalid=true]:border-danger transition-colors duration-150 hover:border-text-disabled";
+  "w-full rounded-md border border-border-default bg-surface px-3 text-base text-text-primary placeholder:text-text-disabled focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-border-focus disabled:bg-subtle disabled:text-text-disabled aria-[invalid=true]:border-danger transition-colors duration-150 hover:border-text-disabled";

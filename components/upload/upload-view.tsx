@@ -13,7 +13,6 @@ import {
   Icon,
   LoadingPanel,
 } from "@/components/ui";
-import { stagger } from "@/components/ui/cn";
 import { RateLimitError, getJob, getPlan, getUploadQuota, submitCVBatch } from "@/lib/api";
 import { track } from "@/lib/analytics";
 import { useAsync } from "@/lib/hooks/use-async";
@@ -49,7 +48,7 @@ function Meter({ label, value, max }: { label: string; value: number; max: numbe
       className="h-2 overflow-hidden rounded-full bg-subtle"
     >
       <div
-        className="h-full rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)]"
+        className="h-full rounded-full bg-primary transition-[width] duration-300 ease-[var(--ease-soft)]"
         style={{ width: `${Math.min(100, (value / max) * 100)}%` }}
       />
     </div>
@@ -204,11 +203,10 @@ export function UploadView({ jobId }: { jobId: string }) {
                 </Button>
               </div>
               <ul className="max-h-80 overflow-y-auto border-t border-border-default">
-                {files.map((file, index) => (
+                {files.map((file) => (
                   <li
                     key={fileKey(file)}
-                    className="animate-stagger flex items-center gap-3 border-b border-border-default px-6 py-2 last:border-b-0"
-                    style={stagger(index)}
+                    className="flex items-center gap-3 border-b border-border-default px-6 py-2 last:border-b-0"
                   >
                     <Icon name="file" size={18} className="shrink-0 text-text-secondary" />
                     <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.name}</span>
@@ -245,7 +243,7 @@ export function UploadView({ jobId }: { jobId: string }) {
                   <Icon
                     name={progress.phase === "scanning" ? "shield" : "upload"}
                     variant="bold"
-                    className={progress.phase === "scanning" ? "animate-pulse" : "animate-bounce-soft"}
+                    className="animate-pulse"
                   />
                 </span>
                 <div>

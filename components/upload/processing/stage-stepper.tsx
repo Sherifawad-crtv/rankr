@@ -28,14 +28,14 @@ export function StageStepper({ progress, active }: StageStepperProps) {
                 className="absolute end-1/2 top-5 h-0.5 w-full overflow-hidden rounded-full bg-border-default"
               >
                 <span
-                  className="block h-full origin-left rounded-full bg-primary transition-transform duration-700 ease-[var(--ease-soft)] rtl:origin-right"
+                  className="block h-full origin-left rounded-full bg-primary transition-transform duration-300 ease-[var(--ease-soft)] rtl:origin-right"
                   style={{ transform: `scaleX(${progress[index - 1]})` }}
                 />
               </span>
             )}
             <span
               className={cn(
-                "relative z-10 flex size-10 items-center justify-center rounded-full border-2 transition-all duration-500 ease-[var(--ease-soft)]",
+                "relative z-10 flex size-10 items-center justify-center rounded-full border-2 transition-all duration-300 ease-[var(--ease-soft)]",
                 complete && "border-primary bg-primary text-primary-contrast",
                 current && "animate-pulse-ring border-primary bg-surface text-primary",
                 !complete && !current && "border-border-default bg-surface text-text-disabled",
@@ -45,12 +45,11 @@ export function StageStepper({ progress, active }: StageStepperProps) {
                 name={complete ? "check" : stage.icon}
                 variant={complete || current ? "bold" : "linear"}
                 size={20}
-                className={cn(current && "animate-bounce-soft")}
               />
             </span>
             <span
               className={cn(
-                "text-center text-sm font-semibold transition-colors duration-300",
+                "text-center text-sm font-semibold transition-colors duration-200",
                 current ? "text-text-primary" : "text-text-secondary",
                 !current && "max-sm:hidden",
               )}

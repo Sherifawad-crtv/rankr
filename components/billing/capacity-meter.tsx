@@ -25,7 +25,7 @@ export function CapacityMeter({ plan }: { plan: Plan }) {
       >
         <div
           className={cn(
-            "h-full rounded-full transition-[width] duration-700 ease-[var(--ease-soft)]",
+            "h-full rounded-full transition-[width] duration-300 ease-[var(--ease-soft)]",
             share >= 1 ? "bg-danger" : share >= NEAR_LIMIT ? "bg-warning" : "bg-primary",
           )}
           style={{ width: `${Math.min(100, share * 100)}%` }}

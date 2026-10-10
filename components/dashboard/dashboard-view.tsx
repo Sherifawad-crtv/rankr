@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import {
-  AnimatedNumber,
   Badge,
   Card,
   ErrorPanel,
@@ -13,7 +12,7 @@ import {
   LoadingPanel,
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
-import { cn, stagger } from "@/components/ui/cn";
+import { cn } from "@/components/ui/cn";
 import { getDashboard } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
 import { useLocale } from "@/lib/i18n/locale-context";
@@ -29,22 +28,18 @@ function Stat({
   label,
   value,
   hint,
-  index,
 }: {
   label: string;
   value: number;
   hint: string;
-  index: number;
 }) {
   return (
     <Card
-      interactive
-      className="animate-stagger col-span-2 flex flex-col gap-1 lg:col-span-3"
-      style={stagger(index)}
+      className="col-span-2 flex flex-col gap-1 lg:col-span-3"
     >
       <p className="text-sm text-text-secondary">{label}</p>
       <p className="font-display text-xl font-bold text-text-primary">
-        <AnimatedNumber value={value} />
+        {value}
       </p>
       <p className="text-sm text-text-secondary">{hint}</p>
     </Card>
@@ -56,7 +51,7 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
   const { user } = useSession();
   const capacity = plan.cvCapacity;
   return (
-    <Card className="animate-stagger col-span-4 flex flex-col gap-3 lg:col-span-12" style={stagger(4)}>
+    <Card className="col-span-4 flex flex-col gap-3 lg:col-span-12">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-text-primary">{t("upload.capacity.title")}</h2>
         {/* TODO(spec): Solo capacity is OPEN */}
@@ -79,7 +74,7 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
 function JobsCard({ jobs, className }: { jobs: DashboardSummary["jobs"]; className: string }) {
   const { t, tn } = useLocale();
   return (
-    <Card className={cn("animate-stagger flex flex-col gap-4", className)} style={stagger(5)}>
+    <Card className={cn("flex flex-col gap-4", className)}>
       <h2 className="text-lg font-semibold text-text-primary">{t("dashboard.jobs.title")}</h2>
       <ul className="flex flex-col">
         {jobs.map((job) => (
@@ -158,25 +153,21 @@ export function DashboardView() {
               label={t("dashboard.stat.openJobs")}
               value={openJobs.length}
               hint={t("dashboard.stat.openJobsHint")}
-              index={0}
             />
             <Stat
               label={t("dashboard.stat.candidates")}
               value={summary.totalCandidates}
               hint={t("dashboard.stat.candidatesHint")}
-              index={1}
             />
             <Stat
               label={t("dashboard.stat.shortlisted")}
               value={summary.shortlistedCount}
               hint={t("dashboard.stat.shortlistedHint")}
-              index={2}
             />
             <Stat
               label={t("dashboard.stat.review")}
               value={summary.needsReviewCount}
               hint={t("dashboard.stat.reviewHint")}
-              index={3}
             />
 
             <CapacityCard plan={summary.plan} />

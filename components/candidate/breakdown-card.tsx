@@ -31,7 +31,7 @@ export function BreakdownCard({ candidate, weights }: { candidate: Candidate; we
                 className="h-2.5 overflow-hidden rounded-full bg-subtle"
               >
                 <div
-                  className="h-full origin-left rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)] rtl:origin-right"
+                  className="h-full origin-left rounded-full bg-primary transition-[width] duration-300 ease-[var(--ease-soft)] rtl:origin-right"
                   style={{ width: `${score}%` }}
                 />
               </div>

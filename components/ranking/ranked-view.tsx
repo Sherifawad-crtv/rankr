@@ -240,7 +240,7 @@ export function RankedView({ jobId }: { jobId: string }) {
               </span>
               <Icon
                 name="chevron-down"
-                className="transition-transform duration-300 ease-[var(--ease-soft)] group-open:rotate-180"
+                className="transition-transform duration-200 ease-[var(--ease-soft)] group-open:rotate-180"
               />
             </summary>
             <div className="border-t border-border-default p-4">

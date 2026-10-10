@@ -77,7 +77,7 @@ export function OnboardingChecklist({ hasJob, hasRun, hasShortlist, firstJobId }
         className="h-2 overflow-hidden rounded-full bg-subtle"
       >
         <div
-          className="h-full rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)]"
+          className="h-full rounded-full bg-primary transition-[width] duration-300 ease-[var(--ease-soft)]"
           style={{ width: `${(doneCount / steps.length) * 100}%` }}
         />
       </div>

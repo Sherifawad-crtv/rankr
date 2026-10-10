@@ -1,4 +1,3 @@
-export { AnimatedNumber } from "./animated-number";
 export { Badge } from "./badge";
 export { Button, buttonClass } from "./button";
 export { Card } from "./card";

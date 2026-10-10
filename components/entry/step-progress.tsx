@@ -23,7 +23,7 @@ export function StepProgress({
             <span className="h-1.5 overflow-hidden rounded-full bg-border-default">
               <span
                 className={cn(
-                  "block h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-[var(--ease-soft)] rtl:origin-right",
+                  "block h-full origin-left rounded-full bg-primary transition-transform duration-300 ease-[var(--ease-soft)] rtl:origin-right",
                   done || active ? "scale-x-100" : "scale-x-0",
                 )}
               />

@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Badge, Button, Card, Icon, Input, Select } from "@/components/ui";
-import { stagger } from "@/components/ui/cn";
 import { inviteMembers } from "@/lib/api";
 import { planQuery } from "@/lib/entry-flow";
 import { parseInvites } from "@/lib/invites";
@@ -86,11 +85,10 @@ export function InviteTeamView({ selection }: { selection: PlanSelection }) {
         </h2>
         {invites.length > 0 && (
           <ul className="flex flex-col divide-y divide-border-default rounded-lg border border-border-default">
-            {invites.map((invite, index) => (
+            {invites.map((invite) => (
               <li
                 key={invite.email}
-                className="animate-stagger flex items-center gap-3 px-4 py-2"
-                style={stagger(index)}
+                className="flex items-center gap-3 px-4 py-2"
               >
                 <span className="min-w-0 flex-1 truncate text-base text-text-primary">{invite.email}</span>
                 <Badge tone={invite.role === "company_admin" ? "primary" : "neutral"}>

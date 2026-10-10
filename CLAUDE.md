@@ -37,7 +37,7 @@ Everything the back-end touches is reached through a **typed service layer** (`l
 - **Language:** English first, Arabic (RTL) next. Every user-facing string in new or rebuilt screens goes through `t("key")` from `useLocale()` (keys live in `lib/i18n/messages/en.ts`; Arabic falls back to English until translated). Use logical CSS properties (`ms-`, `ps-`, `text-start`, `start-`), mirror directional icons with `mirrorRtl`, and test both directions.
 - **White-label:** wrap an organisation's pages in `<BrandScope branding={...}>` to swap the primary colour at runtime. Never hardcode the brand blue; use `bg-primary`, `text-primary`, `text-primary-contrast`.
 - **Feature flags:** `lib/flags.ts`. **Analytics:** `track()` in `lib/analytics.ts` (stub).
-- **Motion:** simple and purposeful (Airbnb-style): press and hover feedback, eased page and step transitions, skeleton loading. Always respect `prefers-reduced-motion` (handled globally in `app/globals.css`).
+- **Motion:** restrained, in the spirit of Material 3 and Apple HIG. Hover and pressed states only on things you can click (links, buttons, inputs, selectable rows or cards): a colour or background change, never a lift, scale, shadow growth or icon zoom. Durations 100–200 ms (progress bars 300 ms), one standard easing, no overshoot or bounce, no stagger, no shake, no count-up numbers. Entrances are a short fade. Looping animation is only for work in progress (loading skeletons, the processing screen). Always respect `prefers-reduced-motion` (handled globally in `app/globals.css`).
 - State: React state + context for app-level concerns (mock session, plan mode). No heavy state lib unless a screen genuinely needs it — ask first.
 - Forms: a single lightweight form approach, consistent across the app.
 

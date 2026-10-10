@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Card, ConfidenceIndicator, Disclaimer, MatchScore } from "@/components/ui";
-import { stagger } from "@/components/ui/cn";
 import { useLocale } from "@/lib/i18n/locale-context";
 import type { TopMatch } from "@/types";
 
@@ -22,8 +21,8 @@ export function TopMatches({ matches }: { matches: TopMatch[] }) {
       ) : (
         <>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {matches.map((match, index) => (
-              <li key={match.candidateId} className="animate-stagger" style={stagger(index)}>
+            {matches.map((match) => (
+              <li key={match.candidateId} >
                 <Link
                   href={`/jobs/${match.jobId}/candidates/${match.candidateId}`}
                   className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus"

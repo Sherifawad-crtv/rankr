@@ -5,7 +5,6 @@ import { RunningBanner } from "@/components/dashboard/running-banner";
 import { PageHeader } from "@/components/shell/page-header";
 import { Badge, Card, EmptyPanel, ErrorPanel, Icon, LoadingPanel } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
-import { stagger } from "@/components/ui/cn";
 import { listJobs, listRuns } from "@/lib/api";
 import { useAsync } from "@/lib/hooks/use-async";
 import { useLocale } from "@/lib/i18n/locale-context";
@@ -38,9 +37,9 @@ export function JobsView() {
             />
           ) : (
             <ul className="grid gap-4 lg:grid-cols-2">
-              {state.data[0].map((job, index) => (
-                <li key={job.id} className="animate-stagger" style={stagger(index)}>
-                  <Card interactive className="flex flex-col gap-4">
+              {state.data[0].map((job) => (
+                <li key={job.id} >
+                  <Card className="flex flex-col gap-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold text-text-primary">{job.title}</h2>

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  AnimatedNumber,
   Badge,
   Button,
   Card,
@@ -15,7 +14,6 @@ import {
   StatusPill,
 } from "@/components/ui";
 import { buttonClass } from "@/components/ui/button";
-import { stagger } from "@/components/ui/cn";
 import { getProcessingStatus, retryFailedFiles } from "@/lib/api";
 import { track } from "@/lib/analytics";
 import { useLocale } from "@/lib/i18n/locale-context";
@@ -173,7 +171,7 @@ export function ProcessingView({ jobId }: { jobId: string }) {
             <div className="flex flex-col gap-1">
               <p className="text-base text-text-secondary">
                 <span className="font-display text-lg font-bold text-text-primary">
-                  <AnimatedNumber value={settled} duration={400} />
+                  {settled}
                 </span>{" "}
                 {t("processing.progress", { total })}
               </p>
@@ -235,15 +233,14 @@ export function ProcessingView({ jobId }: { jobId: string }) {
           {t("processing.files")}
           <Icon
             name="chevron-down"
-            className="transition-transform duration-300 ease-[var(--ease-soft)] group-open:rotate-180"
+            className="transition-transform duration-200 ease-[var(--ease-soft)] group-open:rotate-180"
           />
         </summary>
         <ul className="max-h-96 overflow-y-auto border-t border-border-default">
-          {files.map((file, index) => (
+          {files.map((file) => (
             <li
               key={file.id}
-              className="animate-stagger flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border-default px-6 py-2.5 last:border-b-0"
-              style={stagger(index)}
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border-default px-6 py-2.5 last:border-b-0"
             >
               <Icon name="file" size={18} className="text-text-secondary" />
               <span className="min-w-0 flex-1 truncate text-base text-text-primary">{file.fileName}</span>

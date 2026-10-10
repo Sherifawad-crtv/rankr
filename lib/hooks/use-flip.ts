@@ -2,7 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-const DURATION_MS = 380;
+const DURATION_MS = 200;
 
 /**
  * FLIP re-ordering: when `order` changes, rows glide from their old position to the new one.
@@ -23,7 +23,7 @@ export function useFlip(order: string[]) {
       if (!reduced && before !== undefined && before !== top) {
         element.animate(
           [{ transform: `translateY(${before - top}px)` }, { transform: "translateY(0)" }],
-          { duration: DURATION_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+          { duration: DURATION_MS, easing: "cubic-bezier(0.2, 0, 0, 1)" },
         );
       }
     });

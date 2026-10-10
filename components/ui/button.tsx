@@ -6,11 +6,11 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-primary text-primary-contrast hover:bg-primary-hover hover:shadow-md",
+  primary: "bg-primary text-primary-contrast hover:bg-primary-hover",
   secondary:
     "bg-surface text-text-primary border border-border-default hover:bg-subtle hover:border-text-disabled",
   ghost: "bg-transparent text-text-primary hover:bg-subtle",
-  danger: "bg-danger text-text-inverse hover:opacity-90 hover:shadow-md",
+  danger: "bg-danger text-text-inverse hover:opacity-90",
 };
 
 const sizes: Record<Size, string> = {
@@ -20,7 +20,7 @@ const sizes: Record<Size, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-150 ease-[var(--ease-soft)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 disabled:hover:shadow-none";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors duration-100 ease-[var(--ease-soft)] disabled:cursor-not-allowed disabled:opacity-50";
 
 /** Button styling for non-button elements such as links. */
 export function buttonClass(variant: Variant = "primary", size: Size = "md"): string {

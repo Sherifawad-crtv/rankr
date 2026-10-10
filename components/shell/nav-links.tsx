@@ -21,18 +21,14 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-base font-semibold transition-all duration-200 ease-[var(--ease-soft)] active:scale-[0.98]",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-base font-semibold transition-colors duration-100",
               focusRing,
               active
                 ? "bg-primary/10 text-primary"
                 : "text-text-secondary hover:bg-subtle hover:text-text-primary",
             )}
           >
-            <Icon
-              name={item.icon}
-              variant={active ? "bold" : "linear"}
-              className="transition-transform duration-200 ease-[var(--ease-spring)] group-hover:scale-110"
-            />
+            <Icon name={item.icon} variant={active ? "bold" : "linear"} />
             {t(item.labelKey)}
           </Link>
         );

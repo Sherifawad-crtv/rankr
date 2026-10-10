@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 import { cn } from "./cn";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  /** Lifts on hover. Use for cards that are clickable or contain primary actions. */
+  /** Subtle hover state. Only for cards that are themselves a link or button. */
   interactive?: boolean;
 }
 
@@ -12,7 +12,7 @@ export function Card({ interactive = false, className, ...rest }: CardProps) {
       className={cn(
         "rounded-xl border border-border-default bg-surface p-6 shadow-sm",
         interactive &&
-          "transition-all duration-200 ease-[var(--ease-soft)] hover:-translate-y-0.5 hover:shadow-md",
+          "transition-colors duration-100 hover:border-text-disabled hover:bg-subtle/50",
         className,
       )}
       {...rest}

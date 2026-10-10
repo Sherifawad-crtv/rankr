@@ -21,7 +21,7 @@ export function Segmented<T extends string>({ label, value, onChange, options }:
     >
       <span
         aria-hidden
-        className="absolute inset-y-1 start-1 rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[var(--ease-soft)]"
+        className="absolute inset-y-1 start-1 rounded-full bg-primary shadow-sm transition-transform duration-200 ease-[var(--ease-soft)]"
         style={{
           width: `calc((100% - 0.5rem) / ${options.length})`,
           transform: `translateX(calc(${index} * 100% * var(--dir)))`,

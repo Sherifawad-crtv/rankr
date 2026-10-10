@@ -39,7 +39,7 @@ export function AuthPanel() {
 
       <div
         aria-hidden
-        className="relative flex w-72 animate-float items-center gap-4 rounded-xl bg-surface p-4 text-text-primary shadow-lg"
+        className="relative flex w-72 items-center gap-4 rounded-xl bg-surface p-4 text-text-primary shadow-lg"
       >
         <MatchScore value={87} />
         <div>

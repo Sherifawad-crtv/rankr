@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { useFlip } from "@/lib/hooks/use-flip";
 import { Checkbox } from "./checkbox";
-import { cn, stagger } from "./cn";
+import { cn } from "./cn";
 import { Icon } from "./icons";
 import { Table, Td, Th } from "./table";
 
@@ -137,15 +137,14 @@ export function DataTable<T>({
             </Td>
           </tr>
         )}
-        {sorted.map((row, index) => {
+        {sorted.map((row) => {
           const id = getRowId(row);
           return (
             <tr
               key={id}
               ref={rowRef(id)}
-              style={stagger(index)}
               className={cn(
-                "animate-stagger transition-colors hover:bg-subtle/60",
+                "",
                 selected.has(id) && "bg-primary/5",
               )}
             >

@@ -1,4 +1,3 @@
-import { AnimatedNumber } from "./animated-number";
 import { cn } from "./cn";
 
 type Size = "sm" | "md" | "lg";
@@ -33,13 +32,13 @@ export function MatchScore({ value, size = "md" }: { value: number; size?: Size 
           fill="none"
           strokeWidth="4"
           strokeLinecap="round"
-          className="stroke-primary transition-[stroke-dashoffset] duration-700 ease-[var(--ease-soft)]"
+          className="stroke-primary transition-[stroke-dashoffset] duration-300 ease-[var(--ease-soft)]"
           strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={CIRCUMFERENCE * (1 - percent / 100)}
         />
       </svg>
       <span className={cn("relative font-display font-bold text-text-primary", sizes[size].text)}>
-        <AnimatedNumber value={percent} duration={500} />
+        {percent}
         {size === "lg" && <span className="text-text-secondary">%</span>}
       </span>
     </span>

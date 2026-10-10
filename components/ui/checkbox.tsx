@@ -15,7 +15,7 @@ export function Checkbox({ label, className, ...rest }: CheckboxProps) {
           id={id}
           type="checkbox"
           className={cn(
-            "peer size-5 cursor-pointer appearance-none rounded-md border-2 border-border-default bg-surface transition-all duration-150 ease-[var(--ease-soft)] checked:border-primary checked:bg-primary hover:border-primary active:scale-90",
+            "peer size-5 cursor-pointer appearance-none rounded-md border-2 border-border-default bg-surface transition-colors duration-100 checked:border-primary checked:bg-primary hover:border-primary active:scale-90",
             focusRing,
             className,
           )}
@@ -29,7 +29,7 @@ export function Checkbox({ label, className, ...rest }: CheckboxProps) {
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="pointer-events-none absolute inset-0 m-auto size-3.5 scale-0 text-primary-contrast transition-transform duration-200 ease-[var(--ease-spring)] peer-checked:scale-100"
+          className="pointer-events-none absolute inset-0 m-auto size-3.5 scale-0 text-primary-contrast transition-transform duration-100 ease-[var(--ease-soft)] peer-checked:scale-100"
         >
           <path d="m5 12.5 4.5 4.5L19 7.5" />
         </svg>

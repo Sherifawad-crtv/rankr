@@ -36,7 +36,7 @@ export function Switch({ checked, onChange, label, description, disabled = false
         <span
           aria-hidden
           className={cn(
-            "absolute start-0.5 top-0.5 size-5 rounded-full bg-surface shadow-sm transition-transform duration-300 ease-[var(--ease-spring)]",
+            "absolute start-0.5 top-0.5 size-5 rounded-full bg-surface shadow-sm transition-transform duration-150 ease-[var(--ease-soft)]",
             checked && "translate-x-5 rtl:-translate-x-5",
           )}
         />

@@ -31,18 +31,13 @@ export function Dropzone({ accept, onFiles }: DropzoneProps) {
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-all duration-300 ease-[var(--ease-soft)]",
+        "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors duration-100",
         dragging
-          ? "scale-[1.015] border-primary bg-primary/5 shadow-md"
+          ? "border-primary bg-primary/5"
           : "border-border-default bg-surface hover:border-primary/60",
       )}
     >
-      <span
-        className={cn(
-          "flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 ease-[var(--ease-spring)]",
-          dragging && "scale-110 animate-bounce-soft",
-        )}
-      >
+      <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
         <Icon name="upload" variant="bold" size={28} />
       </span>
       <p className="font-display text-lg font-semibold text-text-primary">
