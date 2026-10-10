@@ -367,3 +367,33 @@ export interface NotificationPreferences {
   runCompleted: boolean;
   productTips: boolean;
 }
+
+export type InvoiceStatus = "paid" | "open" | "failed";
+
+export interface Invoice {
+  id: string;
+  issuedAt: string;
+  /** Null while prices are OPEN. */
+  amount: number | null; // TODO(spec): prices are OPEN
+  status: InvoiceStatus;
+}
+
+export interface BillingOverview {
+  plan: Plan;
+  /** TODO(spec): currency is OPEN. */
+  currency: string | null;
+  /** When the current cycle renews. */
+  renewsAt: string;
+  /** Most recent first. */
+  invoices: Invoice[];
+}
+
+/** What a company admin can change on the Billing screen. */
+export interface PlanChange {
+  /** Enterprise only; Solo capacity is fixed. */
+  tier: EnterpriseCvTier | null;
+  cycle: BillingCycle;
+}
+
+/** Post-run feedback. TODO(spec): confirm a thumbs up / down scale (PRD target: above 80% positive). */
+export type RunRating = "positive" | "negative";

@@ -51,3 +51,7 @@ export function formatDateTime(locale: Locale, iso: string): string {
     timeStyle: "short",
   }).format(new Date(iso));
 }
+
+export function formatDate(locale: Locale, iso: string): string {
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en", { dateStyle: "medium" }).format(new Date(iso));
+}

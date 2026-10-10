@@ -1,4 +1,5 @@
 export * from "./billing";
+export * from "./feedback";
 export * from "./candidates";
 export * from "./jobs";
 export * from "./pricing";

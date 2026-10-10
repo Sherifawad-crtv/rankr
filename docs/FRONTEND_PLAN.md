@@ -293,7 +293,9 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 - [x] Entry funnel re-aligned: translated, progress bar, Google sign-up, Invite team (Enterprise only), Welcome, signs you in on workspace creation.
 - [x] Settings: profile (name, job title, language, change password), company and white-label brand (colour, logo, live preview), team and roles (invite, change role, remove, last-admin guard; Enterprise only), notifications. Admin-only edits; recruiters see company and team read-only.
 - [ ] Delete-my-data flow.
-- [ ] Billing.
+- [x] Billing: plan, CV usage meter (amber near the limit, red when used up), change capacity and cycle, invoices; admins only. Prices, currency and when a change applies stay `TODO(spec)`.
+- [x] Post-run rating prompt on the ranked list (thumbs up or down; scale is `TODO(spec)`).
+- [x] Analytics removed from the sidebar until v1.1.
 
 **Phase 4, admin panel (P1):** companies, users, moderation, reports, block list, pilots. *L*
 

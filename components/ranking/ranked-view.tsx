@@ -35,6 +35,7 @@ import {
 } from "@/types";
 import { CandidateCell } from "./candidate-cell";
 import { ExportDialog } from "./export-dialog";
+import { RunRatingCard } from "./run-rating-card";
 import { RankedToolbar, type StageFilter } from "./ranked-toolbar";
 import { WeightPanel } from "./weight-panel";
 
@@ -330,6 +331,8 @@ export function RankedView({ jobId }: { jobId: string }) {
               />
             )}
           </section>
+
+          <RunRatingCard jobId={jobId} />
         </>
       )}
 

@@ -19,6 +19,7 @@ import { useAsync } from "@/lib/hooks/use-async";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { useSession } from "@/lib/session";
 import type { DashboardSummary } from "@/types";
+import { CapacityMeter } from "@/components/billing/capacity-meter";
 import { OnboardingChecklist } from "./onboarding-checklist";
 import { RecentRunsCard } from "./recent-runs-card";
 import { RunningBanner } from "./running-banner";
@@ -51,7 +52,8 @@ function Stat({
 }
 
 function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
-  const { t, tn } = useLocale();
+  const { t } = useLocale();
+  const { user } = useSession();
   const capacity = plan.cvCapacity;
   return (
     <Card className="animate-stagger col-span-4 flex flex-col gap-3 lg:col-span-12" style={stagger(4)}>
@@ -64,28 +66,11 @@ function CapacityCard({ plan }: { plan: DashboardSummary["plan"] }) {
             : t("upload.capacity.used", { used: plan.cvUsed, capacity })}
         </Badge>
       </div>
-      {capacity !== null && (
-        <>
-          <div
-            role="progressbar"
-            aria-label={t("upload.capacity.aria")}
-            aria-valuemin={0}
-            aria-valuemax={capacity}
-            aria-valuenow={plan.cvUsed}
-            className="h-2 overflow-hidden rounded-full bg-subtle"
-          >
-            <div
-              className="h-full rounded-full bg-primary transition-[width] duration-700 ease-[var(--ease-soft)]"
-              style={{ width: `${Math.min(100, (plan.cvUsed / capacity) * 100)}%` }}
-            />
-          </div>
-          <p className="text-sm text-text-secondary">
-            {tn(
-              plan.mode === "enterprise" ? "dashboard.capacity.leftShared" : "dashboard.capacity.left",
-              Math.max(0, capacity - plan.cvUsed),
-            )}
-          </p>
-        </>
+      <CapacityMeter plan={plan} />
+      {user.role !== "recruiter" && (
+        <Link href="/billing" className="self-start text-base font-semibold text-primary hover:underline">
+          {t("billing.manage")}
+        </Link>
       )}
     </Card>
   );
