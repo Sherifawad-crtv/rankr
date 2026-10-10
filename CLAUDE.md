@@ -72,7 +72,7 @@ Build, lint, and typecheck all green is the bar for "done".
 ---
 
 ## The data seam (how hand-off stays clean)
-- `types/` holds every entity the UI renders — `Job`, `Candidate`, `ParsedCV`, `ScoreBreakdown`, `Plan`, `Member`, `Message`, `Application`, etc. These are **the contract** the back-end engineer implements against. Derive them from the screen specs; keep them honest and minimal.
+- `types/` holds every entity the UI renders — `Job`, `Candidate`, `ParsedCV`, `ScoreBreakdown`, `Plan`, `Member`, `Application`, etc. These are **the contract** the back-end engineer implements against. Derive them from the screen specs; keep them honest and minimal.
 - `lib/api/` exposes async, typed functions (`listCandidates(jobId)`, `getJob(id)`, `createJob(input)` …). Current implementation reads `lib/mocks/` with simulated latency. Each is marked `// TODO(backend)`.
 - Components call `lib/api/` only. Swapping mocks for real endpoints must require **zero component changes**.
 - Every screen must render all its **states** from mock toggles: empty, loading, error, processing, populated, low-confidence. The specs name the states per screen.
@@ -94,7 +94,7 @@ Each spec entry gives layout, components, content, states, and flow. They are in
 
 **Screen set (build order):**
 - **Entry funnel:** Plans → Create account → Verify email → Checkout → Workspace setup → Invite team (Enterprise only) → Welcome. (Solo path drops the tier slider + invite.)
-- **Recruiter app:** App shell · Dashboard · Job creation · CV upload · Processing · Ranked list · Candidate detail · CSV export · Messages · Analytics · Billing · Settings.
+- **Recruiter app:** App shell · Dashboard · Job creation · CV upload · Processing · Ranked list · Candidate detail · CSV export · Analytics · Billing · Settings.
 - **Candidate portal (white-label per organisation: brand, colours and logo are customisable):** Careers · Job detail · Application form · Submitted · Magic-link auth · My applications · Status detail · Messaging · Parsed-profile review · Privacy & data rights.
 - **Admin:** Companies & users · Job moderation · Reports & block list · Bias audit · Pilot onboarding.
 

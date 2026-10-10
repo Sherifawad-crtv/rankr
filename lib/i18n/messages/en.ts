@@ -5,7 +5,6 @@
 export const en = {
   "nav.dashboard": "Dashboard",
   "nav.jobs": "Jobs",
-  "nav.messages": "Messages",
   "nav.analytics": "Analytics",
   "nav.billing": "Billing",
   "nav.settings": "Settings",

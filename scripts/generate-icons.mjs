@@ -14,7 +14,6 @@ const ICONS = {
   list: "list-check",
   briefcase: "case-minimalistic",
   chart: "graph-up",
-  message: "chat-round-dots",
   file: "document-text",
   document: "document",
   folder: "folder-with-files",

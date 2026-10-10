@@ -21,7 +21,7 @@ Answers to the open questions in this plan, as given by the product owner.
 | Monorepo | Keep as is (single repo). |
 | UI language | English first, then Arabic with RTL. |
 | Roles | Three roles: Rankr staff, company admin, recruiter. |
-| Candidate messaging | Add it. |
+| Messaging | Removed. No team or candidate messaging module. |
 | Fonts | **Urbanist** (UI) + **Space Grotesk** (headings, numbers). |
 | Icons | **Solar** icon set. |
 | Roadmap | Do all six phases. |
@@ -70,7 +70,7 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
 | 6 | **Monorepo / tooling** | Turborepo + pnpm, shared types and UI packages | Single repo, npm | Keep single repo; keep `types/` and `components/ui/` self-contained so they lift into packages | pnpm vs npm; do you want the monorepo now? |
 | 7 | **UI language** | CVs are bilingual; "multi-language beyond Arabic + English" is out of scope, which implies Arabic and English are in | Board shows bilingual text; no i18n built | Plan English + Arabic UI with RTL | Is the **app UI** Arabic too, or only CV content? |
 | 8 | **"Admin"** | An **internal** Rankr admin panel (sees all companies). HR roles are "HR admin" and "recruiter" | `CLAUDE.md`/session use one "Admin" role | Three roles: Rankr staff, company admin, recruiter | Confirm |
-| 9 | **"Message candidates"** | Core flow says "shortlist, reject, or **message candidates**"; messaging section says HR **team** messaging (P2, v1.1) | Messages tab exists | Treat messaging as team-only, v1.1 | Do recruiters message candidates at all in v1? |
+| 9 | **"Message candidates"** | Core flow mentions messaging; the product owner removed the messaging module entirely | n/a | No messaging anywhere in the app | Resolved: removed |
 | 10 | **Team access** | Open question: do hiring managers need access in MVP? | Enterprise has unlimited members | Build roles and invite flow after the hero loop | Confirm priority |
 | 11 | **Weight sliders** | P1 "UI prevents invalid saves"; open question: per-job overrides or default only | Built: auto-rebalance so the total is always 100 | Keep auto-rebalance; persist per job | Per-job vs global default |
 | 12 | **Arabic edge cases** | Open: reject with a message, or attempt and flag? | n/a | Attempt and flag with the low-confidence indicator | Confirm |
@@ -110,7 +110,6 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
               /jobs/[id]/runs/[runId]    live processing                 P0   (built as /processing)
               /jobs/[id]/candidates      ranked list                     P0   (built, needs v2)
               /jobs/[id]/candidates/[c]  candidate detail                P0
-              /messages                  team messaging                  P2 (v1.1)
               /analytics                 funnel and usage                P2 (v1.1)
               /billing  /settings/*                                      P0 / P1
 (admin)       /admin/companies  /users  /moderation  /blocklist  /pilots P1
@@ -118,7 +117,7 @@ The PRD, `CLAUDE.md` and my earlier assumptions disagree in places. This is the 
 (candidate)   ON HOLD, see conflict #2
 ```
 
-Navigation: sidebar (Dashboard, Jobs, Messages, Analytics, Billing, Settings). Messages and Analytics stay hidden until v1.1. Admin has its own shell.
+Navigation: sidebar (Dashboard, Jobs, Analytics, Billing, Settings). Analytics stays hidden until v1.1. Admin has its own shell.
 
 ---
 
@@ -177,8 +176,7 @@ Profile, company, notifications, **team and roles** (enterprise), **Delete accou
 ### 5.10 Billing (P0)
 Plan, CV usage against capacity, billing cycle, invoices, change plan. Paymob and Stripe depending on region.
 
-### 5.11 Messaging, analytics (P2, v1.1)
-- Messaging: team threads, with a **Report** button on messages (routes to the admin queue).
+### 5.11 Analytics (P2, v1.1)
 - Analytics: CVs screened, shortlist rate, time-to-shortlist.
 
 ### 5.12 Admin panel (P1)
@@ -233,7 +231,7 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 - `Candidate`: add `matchPercent`, `rationale`, `matchedSkills`, `missingRequiredSkills`, `extraSkills`, `names` (English and Arabic), `ocrUsed`, `duplicateOf`, `cvSignedUrl`.
 - `UploadedCV.status`: `pending | processing | done | failed`, plus `isDuplicate`, `error`.
 - `Skill` (canonical id, English name, Arabic name, aliases) and a skills catalogue API.
-- `HrOutcome` events (shortlist / reject / message / hire) the UI emits.
+- `HrOutcome` events (shortlist / reject / hire) the UI emits.
 - `Role`: `staff | company_admin | recruiter`.
 
 ### 7.2 API seam additions (`lib/api/`, all `TODO(backend)`)
@@ -242,7 +240,7 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 ### 7.3 Cross-cutting
 - **Scenario toggles** (`?mock=loading|error|empty`) already exist; add `rate-limited`, `partial-failure`, `low-confidence-heavy`.
 - **Analytics wrapper:** a thin `track(event, props)` stub (PostHog later) for time-to-rank, shortlist rate and the post-run **CSAT rating prompt** (target above 80% positive).
-- **Feature flags:** a simple config for P2 surfaces (messaging, analytics, admin extras, entry flow).
+- **Feature flags:** a simple config for P2 surfaces (analytics, admin extras, entry flow).
 - **Scoring in the browser:** client-side re-rank stays; add confidence multiplier and per-job persistence.
 
 ---
@@ -259,7 +257,7 @@ Rankr uses React Email via Resend. Design the templates (verification, run compl
 | Stages | Invented stages that include interview/offer (out of scope) |
 | Entry flow | Hidden; sign-in, Google and forgot-password not built; pricing conflicts |
 | i18n / RTL | Not started |
-| Admin, messaging, analytics | Not started |
+| Admin, analytics | Not started |
 
 ---
 
@@ -299,7 +297,7 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 
 **Phase 4, admin panel (P1):** companies, users, moderation, reports, block list, pilots. *L*
 
-**Phase 5, v1.1 (P2):** team messaging with Report button, analytics, integrations settings, bias-audit view, email templates. *L*
+**Phase 5, v1.1 (P2):** analytics, integrations settings, bias-audit view, email templates. *L*
 
 **Phase 6, hardening:** accessibility audit, Arabic and RTL QA on every screen, responsive pass, performance pass, empty/error coverage check, component gallery completion, hand-off docs for the back-end engineer (contract and endpoint list). *M*
 
@@ -316,7 +314,6 @@ Sizes are relative: S (about a day), M (a few days), L (a week or more).
 5. **Is the app UI bilingual, or only CV content?**
 6. Skill tiers: confirm the three tiers and whether the weights are per job or global.
 7. Exact **consent wording** and accepted file limits.
-8. Can recruiters **message candidates** in v1? (conflict #9)
 9. Payment currency and VAT; Paymob vs Stripe selection rule.
 10. Company-admin vs recruiter permissions (who can see billing, delete data, invite people).
 

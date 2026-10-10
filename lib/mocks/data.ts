@@ -2,7 +2,6 @@ import {
   DEFAULT_SCORE_WEIGHTS,
   type Candidate,
   type Job,
-  type Message,
   type Plan,
   type PricingCatalog,
   type ScreeningRun,
@@ -202,7 +201,6 @@ export const mockRuns: ScreeningRun[] = [
   },
 ];
 
-export const mockMessages: Message[] = [];
 
 export const mockPricing: PricingCatalog = {
   currency: null,

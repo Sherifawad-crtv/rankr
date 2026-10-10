@@ -244,14 +244,6 @@ export interface Application {
   submittedAt: string;
 }
 
-export interface Message {
-  id: string;
-  threadId: string;
-  senderName: string;
-  body: string;
-  sentAt: string;
-}
-
 /** Public pricing shown on the Plans screen. */
 export interface PricingCatalog {
   /** TODO(spec): currency is OPEN. */
