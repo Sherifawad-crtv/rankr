@@ -1,10 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
-import { Badge, Button, Icon } from "@/components/ui";
+import { Button, Icon } from "@/components/ui";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { LanguageToggle } from "./language-toggle";
-import { useSession } from "@/lib/session";
 import { Logo } from "@/components/brand/logo";
 import { AccountFooter } from "./account-footer";
 import { DevSwitcher } from "./dev-switcher";
@@ -15,7 +14,6 @@ function Brand() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user } = useSession();
   const { t } = useLocale();
   const drawerRef = useRef<HTMLDialogElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -78,7 +76,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="ms-auto flex flex-wrap items-center gap-3">
             <LanguageToggle />
             <DevSwitcher />
-            <Badge tone="primary">{user.planMode === "solo" ? "Solo" : "Enterprise"}</Badge>
           </div>
         </header>
         <main className="mx-auto w-full max-w-[90rem] flex-1 px-4 py-6 lg:px-8">{children}</main>

@@ -31,7 +31,9 @@ export function AccountFooter() {
         <Avatar name={user.name} />
         <div className="min-w-0">
           <p className="truncate text-base font-semibold text-text-primary">{user.name}</p>
-          <p className="truncate text-sm text-text-secondary">{t(`role.${user.role}`)}</p>
+          <p className="truncate text-sm text-text-secondary">
+            {t(`role.${user.role}`)} · {t(user.planMode === "solo" ? "plans.solo" : "plans.enterprise")}
+          </p>
         </div>
       </div>
       <Button variant="ghost" className="w-full justify-start" loading={signingOut} onClick={onSignOut}>
