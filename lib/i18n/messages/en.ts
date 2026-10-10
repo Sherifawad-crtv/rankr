@@ -612,6 +612,7 @@ export const en = {
 
   "role.company_admin": "Admin",
   "role.recruiter": "Recruiter",
+  "role.staff": "Rankr staff",
   "invite.title": "Invite your team",
   "invite.subtitle": "Add teammates now or later. Everyone shares your CV capacity, and there's no per-seat price.",
   "invite.email": "Teammate's email",
